@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validação de Ensaio — CTIA</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F2F2F7;
+            --surface: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #6E6E73;
+            --accent: #6366F1;
+            --success: #22C55E;
+            --warning: #F59E0B;
+            --radius: 20px;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.5;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+            margin-bottom: 16px;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            padding: 24px;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .rastreio-badge {
+            display: inline-block;
+            background: var(--bg);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .card-body {
+            padding: 28px;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-section {
+            padding: 24px 28px;
+            background: #fafafb;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .validation-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #166534;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .badge-processing {
+            background: rgba(99, 102, 241, 0.1);
+            color: #3730A3;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 32px;
+            height: 32px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .error-message {
+            text-align: center;
+            color: #EF4444;
+            max-width: 300px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            max-width: 300px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <img id="compLogo" src="" alt="Logo" class="logo" style="display: none;">
+        <h1 class="title">Portal de Validação</h1>
+        <p class="subtitle">Laboratório de Ensaios CTIA</p>
+    </div>
+
+    <div id="content" class="card">
+        <div class="card-body loading">
+            <div class="spinner"></div>
+            <span>Validando rastreio...</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 CTIA — Centro Tecnológico de Inteligência Aplicada. Todos os direitos reservados.
+    </div>
+
+    <script>
+        async function init() {
+            const pathParts = window.location.pathname.split('/');
+            const codigo = pathParts[pathParts.length - 1];
+
+            if (!codigo) {
+                renderError('Código de rastreio não fornecido.');
+                return;
+            }
+
+            try {
+                // Fetch Config for Logo
+                const configRes = await fetch('/api/public/config');
+                const config = await configRes.json();
+                if (config.empresa_logo) {
+                    const img = document.getElementById('compLogo');
+                    img.src = config.empresa_logo;
+                    img.style.display = 'inline-block';
+                }
+                if (config.empresa_nome) {
+                    document.title = `CTIA Calçado - Consulta`;
+                }
+
+                // Fetch Ensaio
+                const res = await fetch(`/api/public/consulta/${codigo}`);
+                if (!res.ok) throw new Error('Ensaio não encontrado.');
+
+                const ensaio = await res.json();
+                renderEnsaio(ensaio);
+            } catch (err) {
+                renderError(err.message);
+            }
+        }
+
+        function renderEnsaio(e) {
+            const content = document.getElementById('content');
+            const isFinished = e.status === 'Laudo Gerado';
+
+            content.innerHTML = `
+                <div class="card-header">
+                    <div class="rastreio-badge">${e.codigo_rastreio}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">Validado em: ${new Date().toLocaleDateString('pt-BR')}</div>
+                </div>
+                <div class="card-body">
+                    <div class="info-group">
+                        <span class="info-label">Cliente / Marca</span>
+                        <div class="info-value">${e.cliente || '—'}</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Projeto / Modelo</span>
+                        <div class="info-value">${e.projeto || '—'} ${e.modelo ? `(${e.modelo})` : ''}</div>
+                    </div>
+                    <div class="info-group">
+                        <span class="info-label">Tipo de Ensaio</span>
+                        <div class="info-value">${e.tipo_teste || '—'}</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="info-group">
+                            <span class="info-label">Referência</span>
+                            <div class="info-value">${e.referencia || '—'}</div>
+                        </div>
+                        <div class="info-group">
+                            <span class="info-label">RA AP</span>
+                            <div class="info-value">${e.ap || '—'}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-section">
+                    ${isFinished ? `
+                        <div class="validation-badge badge-success">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                            <span>Documento Autêntico e Validado pelo CTIA</span>
+                        </div>
+                    ` : `
+                        <div class="validation-badge badge-processing">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span>Amostra em Processamento<br><small style="font-weight: 400; opacity: 0.8;">Status: ${e.status}</small></span>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        function renderError(msg) {
+            document.getElementById('content').innerHTML = `
+                <div class="card-body loading">
+                    <div class="error-message">
+                        <svg style="width:48px; height:48px; color: #EF4444; margin-bottom: 12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;">Erro de Validação</div>
+                        <p style="font-size: 0.875rem; opacity: 0.8;">${msg}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

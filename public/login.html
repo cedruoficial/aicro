@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTIA - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-glass">
+            <div class="login-header">
+                <div class="logo-placeholder" style="background: transparent;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="color: var(--primary-color)">
+                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                        <polyline points="2 17 12 22 22 17"></polyline>
+                        <polyline points="2 12 12 17 22 12"></polyline>
+                    </svg>
+                </div>
+                <h1 id="empresaNome">CTIA Calçado</h1>
+                <p>Centro Tecnológico de Inteligência Aplicada</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">E-mail</label>
+                    <div class="input-wrapper">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z">
+                            </path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="email" placeholder="nome@cromotransfer.com.br" required
+                            autocomplete="email">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="senha">Senha</label>
+                    <div class="input-wrapper">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="senha" placeholder="••••••••" required
+                            autocomplete="current-password">
+                    </div>
+                </div>
+
+                <button type="submit" id="btnSumbit">
+                    Entrar
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </button>
+            </form>
+
+            <div id="loginFeedback" class="login-feedback"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="toast">Notificação</div>
+
+    <script>
+        const API_BASE = '/api';
+
+        // Config básica (Busca logo/nome público)
+        async function loadPublicConfig() {
+            try {
+                const res = await fetch(`${API_BASE}/public/config`);
+                if (res.ok) {
+                    const data = await res.json();
+                    // Mantem "CTIA Calçado" hardcoded no HTML de login
+                    if (data.empresa_nome && data.empresa_nome !== 'CTIA') {
+                        document.title = `CTIA Calçado - Login`;
+                    }
+                    if (data.empresa_logo) {
+                        const logoPlaceholder = document.querySelector('.logo-placeholder');
+                        logoPlaceholder.innerHTML = `<img src="${data.empresa_logo}" alt="Logo" style="width: 100%; height: auto; max-height: 100%; object-fit: contain; border-radius: 8px;">`;
+                    }
+                }
+            } catch (err) {
+                console.error('Erro ao carregar config pública:', err);
+            }
+        }
+
+        // Se já tiver token válido, redireciona pro index
+        async function checkSession() {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    // Token válido, vai pro sistema
+                    window.location.href = '/';
+                } else {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('usuario');
+                }
+            } catch (e) { /* silent fail, just stay on login */ }
+        }
+
+        // Handle Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnSumbit');
+            const feedback = document.getElementById('loginFeedback');
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value;
+
+            btn.disabled = true;
+            btn.innerHTML = `<div class="spinner"></div> Autenticando...`;
+            feedback.style.display = 'none';
+            feedback.className = 'login-feedback';
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    // Sucesso
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('usuario', JSON.stringify(data.usuario));
+
+                    btn.innerHTML = 'Acesso Liberado <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+                    btn.style.background = 'var(--success-color)';
+                    btn.classList.add('success-shake');
+
+                    setTimeout(() => {
+                        window.location.href = '/'; // Redireciona pro dashboard
+                    }, 500);
+                } else {
+                    // Erro (senha ou email)
+                    throw new Error(data.error || 'Falha na autenticação.');
+                }
+            } catch (err) {
+                feedback.textContent = err.message;
+                feedback.className = 'login-feedback error show';
+                feedback.style.display = 'block';
+
+                btn.innerHTML = 'Entrar no Sistema <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 8px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>';
+                btn.disabled = false;
+            }
+        });
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            checkSession();
+            loadPublicConfig();
+        });
+
+    </script>
+</body>
+
+</html>
