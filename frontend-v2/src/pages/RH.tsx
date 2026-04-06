@@ -2,13 +2,56 @@ import { useState } from 'react';
 import {
   Users, TrendingUp, Award, AlertTriangle,
   Plus, Search, Filter,
-  Star, CheckCircle, XCircle, Coffee
+  Star, CheckCircle, XCircle, Coffee, Bell,
+  ThumbsUp, ThumbsDown, Minus, Send, UserPlus,
+  Calendar, MapPin
 } from 'lucide-react';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-type Turno   = 'Manhã' | 'Tarde' | 'Noite';
+type Turno     = 'Manhã' | 'Tarde' | 'Noite';
 type StatusDia = 'presente' | 'ausente' | 'ferias' | 'remoto';
-type NivelComp = 0 | 1 | 2 | 3 | 4; // 0=não tem, 1=básico, 2=intermediário, 3=avançado, 4=especialista
+type NivelComp = 0 | 1 | 2 | 3 | 4;
+
+// Feedback / Desempenho
+interface Feedback {
+  id: string;
+  data: string;
+  tipo: 'positivo' | 'neutro' | 'negativo' | 'promocao' | 'advertencia';
+  autor: string;
+  texto: string;
+}
+
+// Aviso interno (Mural)
+interface Aviso {
+  id: string;
+  titulo: string;
+  texto: string;
+  data: string;
+  tipo: 'info' | 'alerta' | 'destaque';
+  autor: string;
+}
+
+// Vaga de recrutamento
+type EtapaVaga = 'Triagem' | 'Entrevista' | 'Teste Técnico' | 'Proposta' | 'Contratado';
+interface Candidato {
+  id: string;
+  nome: string;
+  etapa: EtapaVaga;
+  cargo: string;
+  setor: string;
+  origem: string; // "Indicação" | "Indeed" | "LinkedIn"
+  data: string;
+  nota?: number; // 1-5
+}
+interface Vaga {
+  id: string;
+  cargo: string;
+  setor: string;
+  motivacao: string; // "gap de competência" | "crescimento" | "substituição"
+  prioridade: 'alta' | 'media' | 'baixa';
+  abertura: string;
+  candidatos: Candidato[];
+}
 
 interface Colaborador {
   id: string;
@@ -132,12 +175,283 @@ const STATUS_CFG: Record<StatusDia, { label: string; color: string; bg: string; 
 const NIVEL_LABEL = ['—', 'Básico', 'Intermediário', 'Avançado', 'Especialista'];
 const NIVEL_COLOR = ['#E0E0EC', '#74B9FF', '#FDCB6E', '#00B894', '#6C5CE7'];
 
+// ─── Mock: Feedbacks por colaborador ──────────────────────────────────────────
+const FEEDBACKS: Record<string, Feedback[]> = {
+  C001: [
+    { id: 'f1', data: '2026-03-10', tipo: 'positivo', autor: 'Gerência Produção', texto: 'Liderou a transição de setup da Sakurai com zero paradas. Referência da equipe.' },
+    { id: 'f2', data: '2025-11-20', tipo: 'promocao', autor: 'RH', texto: 'Promovido a Operador Sênior após avaliação semestral.' },
+    { id: 'f3', data: '2025-06-05', tipo: 'neutro', autor: 'Supervisor', texto: 'Bom desempenho. Sugerido aprimoramento em comunicação com PCP.' },
+  ],
+  C002: [
+    { id: 'f4', data: '2026-02-14', tipo: 'positivo', autor: 'Gerência Qualidade', texto: 'Detectou lote defeituoso antes do embarque, evitando devolução de R$18k.' },
+    { id: 'f5', data: '2025-09-01', tipo: 'positivo', autor: 'Supervisão', texto: 'Treinamento eficaz dos dois novos revisores.' },
+  ],
+  C007: [
+    { id: 'f6', data: '2026-04-01', tipo: 'negativo', autor: 'Supervisão', texto: 'Terceiro atestado no mês. RH em contato para suporte.' },
+    { id: 'f7', data: '2025-12-10', tipo: 'advertencia', autor: 'RH', texto: 'Advertência verbal por atraso recorrente no período.' },
+  ],
+  C005: [
+    { id: 'f8', data: '2026-03-28', tipo: 'positivo', autor: 'Direção', texto: 'PCP redesenhado reduziu tempo ocioso em 12%. Excelente iniciativa.' },
+    { id: 'f9', data: '2026-01-15', tipo: 'promocao', autor: 'RH', texto: 'Reconhecimento de mérito: aumento por performance acima da meta.' },
+  ],
+};
+
+// ─── Mock: Avisos internos ────────────────────────────────────────────────────
+const AVISOS_MOCK: Aviso[] = [
+  { id: 'av1', titulo: '🏖️ Emenda de feriado confirmada', texto: 'Confirmada emenda do feriado de Tiradentes nos dias 24 e 25/04. Produção programada conforme PCP.', data: '2026-04-06', tipo: 'info', autor: 'Diretoria' },
+  { id: 'av2', titulo: '⚠️ Revisão de EPI obrigatória', texto: 'Todos os setores devem entregar o checklist de EPI até sexta-feira. Responsáveis: supervisores de turno.', data: '2026-04-05', tipo: 'alerta', autor: 'Segurança do Trabalho' },
+  { id: 'av3', titulo: '🎂 Aniversariantes de Abril', texto: 'Parabéns: Carlos Mendonça (12/04) e Juliana Costa (22/04)! Passem no RH para pegar o presente.', data: '2026-04-01', tipo: 'destaque', autor: 'RH' },
+  { id: 'av4', titulo: '📋 Meta de presença: 95%', texto: 'Meta do mês de Abril é 95% de presença. Acompanhe pelo painel de RH.', data: '2026-04-01', tipo: 'info', autor: 'RH' },
+];
+
+// ─── Mock: Vagas e candidatos ─────────────────────────────────────────────────
+const VAGAS_MOCK: Vaga[] = [
+  {
+    id: 'V001', cargo: 'Operador de Máquina Sakurai', setor: 'Produção',
+    motivacao: 'Gap de competência — cobertura única no setor', prioridade: 'alta', abertura: '2026-03-20',
+    candidatos: [
+      { id: 'CA1', nome: 'João Victor S.', etapa: 'Teste Técnico', cargo: 'Operador', setor: 'Produção', origem: 'Indicação', data: '2026-03-22', nota: 4 },
+      { id: 'CA2', nome: 'Paulo Braga', etapa: 'Entrevista', cargo: 'Operador', setor: 'Produção', origem: 'Indeed', data: '2026-03-28', nota: 3 },
+      { id: 'CA3', nome: 'Marcos A. Lima', etapa: 'Triagem', cargo: 'Operador', setor: 'Produção', origem: 'LinkedIn', data: '2026-04-02' },
+    ],
+  },
+  {
+    id: 'V002', cargo: 'Técnico de Qualidade', setor: 'Qualidade (CTIA)',
+    motivacao: 'Crescimento da demanda — novo turno noturno', prioridade: 'media', abertura: '2026-04-01',
+    candidatos: [
+      { id: 'CA4', nome: 'Sandra Melo', etapa: 'Proposta', cargo: 'Técnica QA', setor: 'Qualidade', origem: 'LinkedIn', data: '2026-04-03', nota: 5 },
+    ],
+  },
+  {
+    id: 'V003', cargo: 'Analista PCP', setor: 'PCP (Planejamento)',
+    motivacao: 'Substituição — colaborador em transição', prioridade: 'alta', abertura: '2026-04-05',
+    candidatos: [],
+  },
+];
+
+const ETAPAS: EtapaVaga[] = ['Triagem', 'Entrevista', 'Teste Técnico', 'Proposta', 'Contratado'];
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function tempoAdmissao(data: string) {
   const ms = Date.now() - new Date(data).getTime();
   const anos = Math.floor(ms / (365.25 * 24 * 3600000));
   const meses = Math.floor((ms % (365.25 * 24 * 3600000)) / (30.44 * 24 * 3600000));
   return anos > 0 ? `${anos}a ${meses}m` : `${meses} meses`;
+}
+
+// ─── Componente: Mural de Avisos ──────────────────────────────────────────────
+const AVISO_CFG = {
+  info:     { color: '#0984E3', bg: '#EBF5FF', border: '#0984E330', icon: <Bell size={13} /> },
+  alerta:   { color: '#FF4757', bg: '#FFF0F0', border: '#FF475730', icon: <AlertTriangle size={13} /> },
+  destaque: { color: '#6C5CE7', bg: '#F4F3FD', border: '#6C5CE730', icon: <Star size={13} /> },
+};
+
+function MuralAvisos({ avisos }: { avisos: Aviso[] }) {
+  return (
+    <div className="mb-7">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Bell size={14} className="text-[#6C5CE7]" />
+          <span className="text-xs font-black text-[#2D2D3A] uppercase tracking-widest">Mural de Avisos</span>
+        </div>
+        <button className="flex items-center gap-1.5 text-[10px] font-black text-[#6C5CE7] hover:underline">
+          <Plus size={12} /> Novo Aviso
+        </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+        {avisos.map(av => {
+          const cfg = AVISO_CFG[av.tipo];
+          return (
+            <div key={av.id} className="rounded-2xl border p-4 transition-shadow hover:shadow-md"
+              style={{ background: cfg.bg, borderColor: cfg.border }}>
+              <div className="flex items-center gap-2 mb-2" style={{ color: cfg.color }}>
+                {cfg.icon}
+                <span className="text-[11px] font-black leading-tight">{av.titulo}</span>
+              </div>
+              <p className="text-[11px] text-[#4D4B5A] leading-relaxed mb-2">{av.texto}</p>
+              <div className="flex items-center justify-between mt-auto">
+                <span className="text-[9px] text-[#A0A0B0] font-bold">{av.autor}</span>
+                <span className="text-[9px] text-[#A0A0B0]">{new Date(av.data).toLocaleDateString('pt-BR')}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Componente: Feedback Timeline ────────────────────────────────────────────
+const FB_CFG = {
+  positivo:   { color: '#00B894', bg: '#EEFAF5', icon: <ThumbsUp size={12} />,    label: 'Elogio' },
+  neutro:     { color: '#0984E3', bg: '#EBF5FF', icon: <Minus size={12} />,        label: 'Observação' },
+  negativo:   { color: '#FF4757', bg: '#FFF0F0', icon: <ThumbsDown size={12} />,   label: 'Atenção' },
+  promocao:   { color: '#6C5CE7', bg: '#F4F3FD', icon: <Star size={12} />,         label: 'Promoção / Mérito' },
+  advertencia:{ color: '#E17055', bg: '#FFF4EF', icon: <AlertTriangle size={12} />,label: 'Advertência' },
+};
+
+function FeedbackTimeline({ colaboradorId }: { colaboradorId: string }) {
+  const [novoTexto, setNovoTexto] = useState('');
+  const [novoTipo, setNovoTipo] = useState<Feedback['tipo']>('positivo');
+  const feedbacks = FEEDBACKS[colaboradorId] ?? [];
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-2 h-2 rounded-full bg-[#6C5CE7]" />
+        <h3 className="text-sm font-black text-[#2D2D3A] uppercase tracking-widest">Timeline de Desempenho</h3>
+      </div>
+
+      {/* Adicionar feedback */}
+      <div className="bg-[#F8F7FC] rounded-2xl p-4 mb-4 border border-[#EEEDF5]">
+        <p className="text-[10px] font-black text-[#A0A0B0] uppercase tracking-wider mb-2">Novo Registro</p>
+        <div className="flex gap-2 mb-2 flex-wrap">
+          {(Object.keys(FB_CFG) as Feedback['tipo'][]).map(t => (
+            <button key={t} onClick={() => setNovoTipo(t)}
+              className="px-2.5 py-1 rounded-xl text-[10px] font-black transition-all border"
+              style={novoTipo === t
+                ? { background: FB_CFG[t].color, color: '#fff', borderColor: FB_CFG[t].color }
+                : { background: '#fff', color: '#8B8BA0', borderColor: '#E8E6F0' }}>
+              {FB_CFG[t].label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input value={novoTexto} onChange={e => setNovoTexto(e.target.value)}
+            placeholder="Descreva o feedback..."
+            className="flex-1 px-3 py-2 text-xs border border-[#EEEDF5] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6C5CE720] bg-white" />
+          <button className="px-3 py-2 rounded-xl text-white text-xs font-black flex items-center gap-1.5 transition-all hover:opacity-90"
+            style={{ background: 'linear-gradient(135deg, #6C5CE7, #5A4BCE)' }}>
+            <Send size={12} /> Salvar
+          </button>
+        </div>
+      </div>
+
+      {/* Linha do tempo */}
+      {feedbacks.length === 0 ? (
+        <p className="text-xs text-[#C0C0D0] text-center py-6">Nenhum feedback registrado ainda.</p>
+      ) : (
+        <div className="relative space-y-3 pl-5 border-l-2 border-[#EEEDF5]">
+          {feedbacks.map(fb => {
+            const cfg = FB_CFG[fb.tipo];
+            return (
+              <div key={fb.id} className="relative">
+                <span className="absolute -left-[23px] w-5 h-5 rounded-full border-2 border-white flex items-center justify-center shadow-sm"
+                  style={{ background: cfg.bg, color: cfg.color }}>
+                  {cfg.icon}
+                </span>
+                <div className="bg-white rounded-2xl border border-[#EEEDF5] p-3.5 hover:shadow-sm transition-shadow">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full"
+                      style={{ color: cfg.color, background: cfg.bg }}>{cfg.label}</span>
+                    <span className="text-[9px] text-[#B0B0C0]">{new Date(fb.data).toLocaleDateString('pt-BR')} · {fb.autor}</span>
+                  </div>
+                  <p className="text-xs text-[#4D4B5A] leading-relaxed">{fb.texto}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Componente: Painel de Recrutamento ───────────────────────────────────────
+const PRIO_CFG = {
+  alta:  { color: '#FF4757', bg: '#FFF0F0', label: 'Alta' },
+  media: { color: '#FDCB6E', bg: '#FFFBEB', label: 'Média' },
+  baixa: { color: '#00B894', bg: '#EEFAF5', label: 'Baixa' },
+};
+
+function PainelRecrutamento({ vagas }: { vagas: Vaga[] }) {
+  const [vagaSel, setVagaSel] = useState<Vaga>(vagas[0]);
+
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+      {/* Lista de vagas */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-black text-[#2D2D3A] uppercase tracking-widest">Vagas Abertas</span>
+          <button className="flex items-center gap-1 text-[10px] font-black text-[#6C5CE7]">
+            <Plus size={12} /> Nova Vaga
+          </button>
+        </div>
+        {vagas.map(v => {
+          const pc = PRIO_CFG[v.prioridade];
+          const isSelected = vagaSel?.id === v.id;
+          return (
+            <button key={v.id} onClick={() => setVagaSel(v)} className={`w-full text-left rounded-2xl border p-4 transition-all ${isSelected ? 'border-[#6C5CE7] shadow-md bg-[#F4F3FD]' : 'bg-white border-[#E8E6F0] hover:border-[#C0C0D0]'}`}>
+              <div className="flex items-start justify-between gap-2 mb-2">
+                <div>
+                  <div className="text-sm font-black text-[#2D2D3A] leading-tight">{v.cargo}</div>
+                  <div className="text-[10px] text-[#8B8BA0] font-medium mt-0.5 flex items-center gap-1">
+                    <MapPin size={9} /> {v.setor}
+                  </div>
+                </div>
+                <span className="text-[9px] font-black px-2 py-0.5 rounded-full shrink-0"
+                  style={{ color: pc.color, background: pc.bg }}>{pc.label}</span>
+              </div>
+              <div className="text-[10px] text-[#A0A0B0] italic mb-2">{v.motivacao}</div>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-[#6C5CE7]">{v.candidatos.length} candidato{v.candidatos.length !== 1 ? 's' : ''}</span>
+                <span className="text-[9px] text-[#C0C0D0] flex items-center gap-1">
+                  <Calendar size={9} /> Aberta {new Date(v.abertura).toLocaleDateString('pt-BR')}
+                </span>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Pipeline da vaga selecionada */}
+      {vagaSel && (
+        <div className="xl:col-span-2 bg-white rounded-2xl border border-[#E8E6F0] p-5">
+          <div className="flex items-start justify-between mb-5">
+            <div>
+              <h3 className="text-base font-black text-[#2D2D3A]">{vagaSel.cargo}</h3>
+              <p className="text-xs text-[#8B8BA0] mt-0.5">{vagaSel.setor} · <span className="italic">{vagaSel.motivacao}</span></p>
+            </div>
+            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-white text-[11px] font-black"
+              style={{ background: 'linear-gradient(135deg, #6C5CE7, #5A4BCE)' }}>
+              <UserPlus size={12} /> Adicionar Candidato
+            </button>
+          </div>
+
+          {/* Kanban de etapas */}
+          <div className="grid grid-cols-5 gap-2 mb-4">
+            {ETAPAS.map(etapa => {
+              const count = vagaSel.candidatos.filter(c => c.etapa === etapa).length;
+              return (
+                <div key={etapa} className="text-center">
+                  <div className={`py-1.5 px-1 rounded-xl text-[9px] font-black mb-2 ${count > 0 ? 'bg-[#6C5CE7] text-white' : 'bg-[#F0F0F5] text-[#A0A0B0]'}`}>{etapa}</div>
+                  {vagaSel.candidatos.filter(c => c.etapa === etapa).map(cand => (
+                    <div key={cand.id} className="bg-[#F8F7FC] rounded-xl p-2 mb-1.5 border border-[#EEEDF5] text-left hover:shadow-sm transition-shadow">
+                      <div className="text-[10px] font-black text-[#2D2D3A] truncate">{cand.nome}</div>
+                      <div className="text-[9px] text-[#A0A0B0] mt-0.5">{cand.origem}</div>
+                      {cand.nota && (
+                        <div className="flex mt-1">
+                          {[1,2,3,4,5].map(s => (
+                            <Star key={s} size={8} className={s <= cand.nota! ? 'text-[#FDCB6E]' : 'text-[#E0E0E0]'} fill={s <= cand.nota! ? '#FDCB6E' : 'none'} />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              );
+            })}
+          </div>
+
+          {vagaSel.candidatos.length === 0 && (
+            <div className="text-center py-8 text-[#C0C0D0] text-xs font-bold border-2 border-dashed border-[#EEEDF5] rounded-2xl">
+              Nenhum candidato ainda. Clique em "Adicionar Candidato".
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ─── Mini donut CSS ───────────────────────────────────────────────────────────
@@ -555,7 +869,7 @@ function WorkloadPanel({ colabs }: { colabs: Colaborador[] }) {
 }
 
 // ─── Página RH ────────────────────────────────────────────────────────────────
-type ViewTab = 'equipe' | 'competencias' | 'analise';
+type ViewTab = 'equipe' | 'competencias' | 'analise' | 'desempenho' | 'recrutamento';
 
 export function RH() {
   const [tab, setTab]             = useState<ViewTab>('equipe');
@@ -583,6 +897,9 @@ export function RH() {
 
   return (
     <div className="p-6 md:p-8 max-w-[1400px] mx-auto animate-in fade-in duration-300">
+
+      {/* Mural de Avisos */}
+      <MuralAvisos avisos={AVISOS_MOCK} />
 
       {/* Header */}
       <div className="flex items-start justify-between mb-8 gap-4 flex-wrap">
@@ -625,12 +942,14 @@ export function RH() {
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-[#E8E6F0] pb-4">
         {([
-          { key: 'equipe',      icon: <Users size={14} />,      label: 'Equipe' },
-          { key: 'competencias',icon: <Award size={14} />,      label: 'Competências' },
-          { key: 'analise',     icon: <TrendingUp size={14} />, label: 'Análise / Gaps' },
+          { key: 'equipe',       icon: <Users size={14} />,       label: 'Equipe' },
+          { key: 'competencias', icon: <Award size={14} />,       label: 'Competências' },
+          { key: 'analise',      icon: <TrendingUp size={14} />,  label: 'Análise / Gaps' },
+          { key: 'desempenho',   icon: <Star size={14} />,        label: 'Desempenho' },
+          { key: 'recrutamento', icon: <UserPlus size={14} />,    label: 'Recrutamento' },
         ] as { key: ViewTab; icon: React.ReactNode; label: string }[]).map(t => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black transition-all ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black transition-all ${
               tab === t.key
                 ? 'text-white shadow-md'
                 : 'bg-white text-[#8B8BA0] border border-[#E8E6F0] hover:border-[#C0C0D0]'
@@ -765,8 +1084,71 @@ export function RH() {
         </div>
       )}
 
+      {/* ─────────────── ABA: DESEMPENHO ─────────────── */}
+      {tab === 'desempenho' && (
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+          {/* Lista de colaboradores para seleção */}
+          <div className="space-y-2">
+            <div className="text-xs font-black text-[#2D2D3A] uppercase tracking-widest mb-3">Selecionar Colaborador</div>
+            {COLABORADORES.map(c => (
+              <button key={c.id} onClick={() => setSelectedColab(c)}
+                className={`w-full flex items-center gap-3 p-3 rounded-2xl border text-left transition-all ${selectedColab?.id === c.id ? 'border-[#6C5CE7] bg-[#F4F3FD] shadow-md' : 'bg-white border-[#E8E6F0] hover:border-[#C0C0D0]'}`}>
+                <Avatar c={c} size={32} />
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-black text-[#2D2D3A] truncate">{c.nome}</div>
+                  <div className="text-[10px] text-[#8B8BA0]">{c.cargo}</div>
+                </div>
+                <span className="text-[10px] font-black shrink-0" style={{ color: (FEEDBACKS[c.id]?.length ?? 0) > 0 ? '#6C5CE7' : '#C0C0D0' }}>
+                  {FEEDBACKS[c.id]?.length ?? 0} reg.
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Timeline do colaborador selecionado */}
+          <div className="xl:col-span-2 bg-white rounded-2xl border border-[#E8E6F0] p-6">
+            {selectedColab ? (
+              <>
+                <div className="flex items-center gap-4 mb-6 pb-5 border-b border-[#F0F0F5]">
+                  <Avatar c={selectedColab} size={48} />
+                  <div>
+                    <h3 className="text-base font-black text-[#2D2D3A]">{selectedColab.nome}</h3>
+                    <p className="text-xs text-[#8B8BA0]">{selectedColab.cargo} · {selectedColab.subSetor}</p>
+                  </div>
+                </div>
+                <FeedbackTimeline colaboradorId={selectedColab.id} />
+              </>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center py-20 text-[#C0C0D0]">
+                <Star size={32} className="mb-3 opacity-30" />
+                <p className="font-bold text-sm">Selecione um colaborador</p>
+                <p className="text-xs mt-1">para visualizar o histórico de desempenho</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────── ABA: RECRUTAMENTO ─────────────── */}
+      {tab === 'recrutamento' && (
+        <div className="space-y-5">
+          {/* Alerta inteligente: gaps → sugestão de vagas */}
+          <div className="bg-[#F4F3FD] border border-[#6C5CE730] rounded-2xl px-5 py-4 flex items-start gap-3">
+            <AlertTriangle size={16} className="text-[#6C5CE7] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-black text-[#6C5CE7] uppercase tracking-wider mb-1">Recrutamento Sugerido pela Análise de Gaps</p>
+              <p className="text-xs text-[#6B6B80]">
+                Com base na matriz de competências, <strong>TPU</strong> e <strong>Gestão de Equipe</strong> têm cobertura crítica (ponto único de falha).
+                As vagas de <strong>Operador Sakurai</strong> e <strong>Analista PCP</strong> foram abertas automaticamente como recomendação estratégica.
+              </p>
+            </div>
+          </div>
+          <PainelRecrutamento vagas={VAGAS_MOCK} />
+        </div>
+      )}
+
       {/* Modal detalhe colaborador */}
-      {selectedColab && (
+      {selectedColab && tab !== 'desempenho' && (
         <ColabModal c={selectedColab} onClose={() => setSelectedColab(null)} />
       )}
     </div>

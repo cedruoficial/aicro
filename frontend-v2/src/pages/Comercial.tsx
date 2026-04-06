@@ -3,6 +3,7 @@ import {
   Plus, Search, Clock, CheckCircle2,
   ArrowRight, Package, User, FileText, Zap, Filter
 } from 'lucide-react';
+import { TransitTimeline } from '../components/TransitTimeline';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 type PedidoTipo    = 'Producao' | 'Desenvolvimento';
@@ -509,6 +510,25 @@ export function Comercial() {
           </div>
         ))}
       </div>
+
+      {/* Timeline de Trânsito — retornos vindos da cadeia para faturamento/reclamacao */}
+      {
+        (() => {
+          const retornos = pedidos.filter(p =>
+            p.status === 'reclamacao' || p.status === 'enviado_arte' || p.status === 'enviado_pd'
+          );
+          const items = retornos.map(p => ({
+            ref: p.ref, cliente: p.cliente, produto: p.produto,
+            origemSetor: p.destinoProximo, slaHoras: 2,
+          }));
+          return items.length > 0 ? (
+            <TransitTimeline
+              items={items}
+              titulo="Pedidos em trânsito para setores — aguardando resposta"
+            />
+          ) : null;
+        })()
+      }
 
       {/* Grid de pedidos */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { SECTORS } from '../data/mock';
 import { ArrowLeft, CheckCircle, AlertCircle, ArrowRight, Lock, Unlock, Timer } from 'lucide-react';
+import { TransitTimeline } from '../components/TransitTimeline';
 import { useState, useEffect } from 'react';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -276,6 +277,13 @@ export function SectorDetail() {
           </div>
         </div>
       </div>
+
+      <TransitTimeline
+        items={allTasks.filter(t => t.status === 'bloqueado').map(t => ({
+          ref: t.ref, cliente: t.cliente, produto: t.produto,
+          origemSetor: t.origemSetor, slaHoras: t.slaHoras,
+        }))}
+      />
 
       {/* Filter pills */}
       <div className="flex items-center gap-2 mb-6 flex-wrap">

@@ -5,8 +5,9 @@ import { SUBSECTOR_TASKS, type SubTask, type SubTaskStatus } from '../data/mockS
 import {
   ArrowLeft, Clock, CheckCircle, AlertCircle,
   ArrowRight, Lock, Timer, ChevronDown, ChevronUp,
-  Info, AlertTriangle, X, Send
+  AlertTriangle, X, Send
 } from 'lucide-react';
+import { TransitTimeline } from '../components/TransitTimeline';
 
 // ─── Mapa completo do fluxo (baseado no fluxograma) ───────────────────────────
 // Cada sub-setor conhece: de onde vem, para onde vai e onde está no fluxo geral
@@ -577,15 +578,12 @@ export function SubSectorDetail() {
       {/* BARRA DO FLUXO — removida, info está dentro dos cards */}
 
 
-      {/* Aviso se há bloqueados */}
-      {counts.bloqueado > 0 && (
-        <div className="bg-[#F4F3F8] border border-[#D0D0E0] rounded-2xl px-5 py-3 mb-5 flex items-center gap-3">
-          <Info size={16} className="text-[#8B8BA0] shrink-0" />
-          <span className="text-sm text-[#6B6B80] font-medium">
-            <strong>{counts.bloqueado} pedido{counts.bloqueado > 1 ? 's' : ''}</strong> aguardando liberação do setor anterior. Eles aparecerão em fila automaticamente quando o setor anterior finalizar.
-          </span>
-        </div>
-      )}
+      <TransitTimeline
+        items={allTasks.filter(t => t.status === 'bloqueado').map(t => ({
+          ref: t.ref, cliente: t.cliente, produto: t.produto,
+          origemSetor: t.origemSetor, slaHoras: t.slaHoras,
+        }))}
+      />
 
       {/* Filtros */}
       <div className="flex items-center gap-2 mb-5 flex-wrap">
