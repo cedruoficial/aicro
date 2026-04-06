@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { BarChart2, FileText } from 'lucide-react';
+import { BarChart2, FileText, BadgeDollarSign } from 'lucide-react';
 import { Dashboard } from './Dashboard';
 import { Relatorios } from './Relatorios';
+import { Financeiro } from './Financeiro';
 
-type InsightsTab = 'dashboard' | 'relatorios';
+type InsightsTab = 'dashboard' | 'relatorios' | 'financeiro';
 
 const TABS: { key: InsightsTab; label: string; icon: React.ReactNode; sub: string }[] = [
   {
@@ -17,6 +18,12 @@ const TABS: { key: InsightsTab; label: string; icon: React.ReactNode; sub: strin
     label: 'Relatórios Operacionais',
     icon: <FileText size={15} />,
     sub: 'Lead time, SLA e impedimentos',
+  },
+  {
+    key: 'financeiro',
+    label: 'Análise Financeira',
+    icon: <BadgeDollarSign size={15} />,
+    sub: 'Custos operacionais e perdas',
   },
 ];
 
@@ -62,6 +69,7 @@ export function Insights() {
       <div className="animate-in fade-in duration-300">
         {tab === 'dashboard' && <Dashboard />}
         {tab === 'relatorios' && <Relatorios />}
+        {tab === 'financeiro' && <Financeiro />}
       </div>
     </div>
   );

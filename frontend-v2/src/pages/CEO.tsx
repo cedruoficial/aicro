@@ -24,9 +24,9 @@ export function CEO() {
       const data = await response.json();
       if (data.error) throw new Error(data.error);
       setAiAnalysis(data.analysis);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      setAiAnalysis("Erro ao realizar análise estratégica. Verifique a conexão com o servidor.");
+      setAiAnalysis(`Erro na análise estratégica: ${err.message || 'Verifique a conexão com o servidor.'}`);
     } finally {
       setIsAILoading(false);
     }

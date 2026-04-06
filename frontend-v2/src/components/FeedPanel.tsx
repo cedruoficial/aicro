@@ -1,26 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import { FEED_EVENTS, SECTORS } from '../data/mock';
+import type { FeedEvent } from '../types';
 import { typeConfig } from '../data/constants';
-import { AlertCircle, User, Target, Box, Wrench, Clock, PlayCircle, UserPlus, FileSearch } from 'lucide-react';
+import { AlertCircle, User, Target, Box, Wrench, Clock, PlayCircle, UserPlus, FileSearch, BellRing, History } from 'lucide-react';
+
+// Generates fake random events to keep the feed moving
+function generateFakeEvent(idCounter: number): FeedEvent {
+  const templates = [
+    { type: 'aprovado', sector: 'Qualidade', msg: 'Amostra liberada para produção em lote', detail: 'Testes físicos OK.' },
+    { type: 'info', sector: 'PCP', msg: 'Ajuste fino no setup da máquina finalizado', detail: 'Impressora #3 operando com tinta Cromo.' },
+    { type: 'alerta', sector: 'Expedição', msg: 'Atraso na coleta Jadlog', detail: 'Motorista reportou atraso de 40min na rota.' },
+    { type: 'info', sector: 'Laboratório', msg: 'Nova batida de tinta Cromo aprovada', detail: 'Lote TK-990.' }
+  ] as const;
+  
+  const t = templates[idCounter % templates.length];
+  const now = new Date();
+  
+  return {
+    id: idCounter,
+    time: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+    type: t.type,
+    sector: t.sector,
+    message: t.msg,
+    detail: t.detail,
+    notifyTo: [],
+  };
+}
 
 export function FeedPanel() {
   const [selectedFeedItem, setSelectedFeedItem] = useState<number | null>(null);
+  const [liveFeed, setLiveFeed] = useState<FeedEvent[]>(FEED_EVENTS);
+  const idRef = useRef(100);
+
+  // Simulation of incoming real-time feed updates
+  useEffect(() => {
+    const int = setInterval(() => {
+      idRef.current += 1;
+      const newEvt = generateFakeEvent(idRef.current);
+      setLiveFeed(prev => [newEvt, ...prev].slice(0, 50)); // keep last 50
+    }, 4500); // 4.5 seconds tick
+
+    return () => clearInterval(int);
+  }, []);
 
   return (
     <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden sticky top-[88px] h-[calc(100vh-112px)]">
       {/* Header */}
       <div className="p-5 px-6 border-b border-[#F0F0F5] flex items-center justify-between shrink-0">
         <div>
-          <h2 className="text-base font-bold m-0 text-[#2D2D3A]">Feed em Tempo Real</h2>
-          <p className="text-xs text-[#8B8BA0] mt-0.5 font-medium">Atualizações da cadeia produtiva</p>
+          <h2 className="text-base font-bold m-0 text-[#2D2D3A] flex items-center gap-2">
+            Feed em Tempo Real
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00B894] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00B894]"></span>
+            </span>
+          </h2>
+          <p className="text-xs text-[#8B8BA0] mt-0.5 font-medium">Sincronizando setor produtivo...</p>
         </div>
-        <div className="w-2.5 h-2.5 rounded-full bg-[#00B894] shadow-[0_0_0_3px_#00B89420]" />
       </div>
 
       {/* List */}
       <div className="flex-1 overflow-y-auto py-2 pr-1 custom-scrollbar">
-        {FEED_EVENTS.map(event => {
+        {liveFeed.map(event => {
           const config = typeConfig[event.type];
           const isSelected = selectedFeedItem === event.id;
 
@@ -28,7 +70,7 @@ export function FeedPanel() {
             <div
               key={event.id}
               onClick={() => setSelectedFeedItem(isSelected ? null : event.id)}
-              className="p-3.5 px-6 border-l-4 mb-px cursor-pointer transition-all duration-200"
+              className="p-3.5 px-6 border-l-4 mb-px cursor-pointer transition-all duration-300 animate-in slide-in-from-top-4 fade-in-0"
               style={{
                 borderLeftColor: config.color,
                 background: isSelected ? config.bg : 'transparent',
@@ -127,7 +169,7 @@ export function FeedPanel() {
                     </div>
                   )}
 
-                  {event.notifyTo.length > 0 && (
+                  {event.notifyTo && event.notifyTo.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       <span className="text-[10px] text-[#A0A0B0] font-bold flex items-center mr-1 uppercase tracking-wide">
                         Notificado:
@@ -154,12 +196,14 @@ export function FeedPanel() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 px-6 border-t border-[#F0F0F5] flex items-center justify-between shrink-0">
-        <span className="text-xs text-[#A0A0B0] font-extrabold uppercase tracking-wider">
-          {FEED_EVENTS.length} eventos hoje
-        </span>
-        <button className="py-2 px-4 rounded-lg border-none bg-[#6C5CE7] hover:bg-[#5A4BCE] transition-colors text-white text-xs font-bold cursor-pointer shadow-[0_2px_8px_rgba(108,92,231,0.25)]">
-          Ver Histórico
+      <div className="p-4 px-6 border-t border-[#F0F0F5] bg-[#FAFAFC] flex justify-between items-center shrink-0">
+        <button className="flex items-center gap-2 py-2 px-3 rounded-xl bg-white border border-[#EEEDF5] hover:border-[#F6C948] hover:bg-[#FFFBEE] text-[#9A7B0A] shadow-sm transition-all animate-pulse shadow-yellow-100">
+          <BellRing size={14} className="text-[#F6C948]" />
+          <span className="text-xs font-black tracking-tight">Alertas Históricos</span>
+        </button>
+
+        <button className="flex items-center gap-2 py-2 px-3 rounded-xl text-[#0984E3] hover:bg-[#0984E310] transition-colors font-bold text-xs">
+          <History size={14} /> Full Log
         </button>
       </div>
 

@@ -6,7 +6,7 @@ function verifyToken(req, res, next) {
     const url = req.originalUrl || req.path;
     console.log(`[MIDDLEWARE] Verificando URL: originalUrl=${req.originalUrl}, path=${req.path}`);
 
-    if (url.startsWith('/api/auth/login') || url.startsWith('/api/public') || url === '/api/network-info') {
+    if (url.startsWith('/api/auth/login') || url.startsWith('/api/public') || url === '/api/network-info' || url.startsWith('/api/ai')) {
         console.log(`[MIDDLEWARE] Rota pública liberada: ${url}`);
         return next();
     }

@@ -1,5 +1,6 @@
-import { X, Sparkles, Copy, Check, Info } from 'lucide-react';
 import { useState } from 'react';
+import { exportToPDF } from '../utils/ExportUtils';
+import { X, Sparkles, Copy, Check, Info, FileDown } from 'lucide-react';
 
 interface AIAnalysisModalProps {
   isOpen: boolean;
@@ -112,7 +113,7 @@ export function AIAnalysisModal({ isOpen, onClose, analysis, isLoading }: AIAnal
                 </div>
               </div>
 
-              <div className="text-sm leading-relaxed font-medium">
+              <div id="ai-analysis-content" className="text-sm leading-relaxed font-medium">
                 {formatText(analysis)}
               </div>
               
@@ -128,22 +129,32 @@ export function AIAnalysisModal({ isOpen, onClose, analysis, isLoading }: AIAnal
         {/* Footer */}
         {!isLoading && analysis && (
           <div className="px-8 py-5 border-t border-[#2D2B3A] bg-[#1A1825]/90 flex justify-end">
-            <button 
-              onClick={handleCopy}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#222030] border border-[#2D2B3A] text-sm font-bold text-white hover:bg-[#2A283A] transition-all"
-            >
-              {copied ? (
-                <>
-                  <Check size={16} className="text-[#00B894]" />
-                  <span className="text-[#00B894]">Copiado!</span>
-                </>
-              ) : (
-                <>
-                  <Copy size={16} className="text-[#6C5CE7]" />
-                  <span>Copiar Insights</span>
-                </>
-              )}
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={handleCopy}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#222030] border border-[#2D2B3A] text-sm font-bold text-white hover:bg-[#2A283A] transition-all"
+              >
+                {copied ? (
+                  <>
+                    <Check size={16} className="text-[#00B894]" />
+                    <span className="text-[#00B894]">Copiado!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={16} className="text-[#6C5CE7]" />
+                    <span>Copiar Insights</span>
+                  </>
+                )}
+              </button>
+
+              <button 
+                onClick={() => exportToPDF(analysis, `Breafing_Guerra_CEO_${new Date().toISOString().split('T')[0]}.pdf`)}
+                className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#6C5CE7] border border-[#7D6DF7] text-sm font-bold text-white hover:bg-[#5A4BCE] transition-all shadow-[0_8px_16px_rgba(108,92,231,0.2)]"
+              >
+                <FileDown size={16} />
+                <span>Baixar PDF</span>
+              </button>
+            </div>
           </div>
         )}
       </div>

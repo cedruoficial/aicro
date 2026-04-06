@@ -1,5 +1,14 @@
 export type ProductionStatus = 'Programado' | 'Em Preparação' | 'Em Produção' | 'Concluído' | 'Atrasado';
 
+export interface ProductionOperation {
+  id: string;
+  description: string; // e.g. "03466 - VERDE GEODE TEAL 3ND NIKE BASE"
+  screen: string; // e.g. "90", "77"
+  inkNeeded: number; // Necessidade Prevista (kg)
+  passesInfo: string; // e.g. "Monte 1 tom 2 passadas. Montes 2,3,4,5 e 6 com uma passada."
+  impressions: number; // Folhas Impressas
+}
+
 export interface ProductionBlock {
   id: string;
   reference: string;
@@ -10,6 +19,7 @@ export interface ProductionBlock {
   programadoFim: string;
   status: ProductionStatus;
   progress: number;
+  operations?: ProductionOperation[];
 }
 
 export interface Machine {

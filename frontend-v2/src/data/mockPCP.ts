@@ -73,6 +73,32 @@ function makeBlock(
     programadoFim: d(date, hEnd),
     status,
     progress,
+    operations: [
+      {
+        id: `op-${_blockId}-1`,
+        description: "03466 - VERDE GEODE TEAL 3ND NIKE BASE",
+        screen: "90",
+        inkNeeded: 66.156,
+        passesInfo: "Monte 1 tem 2 passadas. Montes 2 a 6 tem uma passada.",
+        impressions: 2287
+      },
+      {
+        id: `op-${_blockId}-2`,
+        description: "00493 - BRANCO BA CROMO EVO",
+        screen: "77",
+        inkNeeded: 115.845,
+        passesInfo: "Passada única",
+        impressions: 2195
+      },
+      {
+        id: `op-${_blockId}-3`,
+        description: "00001 - BLOCK EVO CAT.1%157+1%CARBO",
+        screen: "44",
+        inkNeeded: 212.112,
+        passesInfo: "3 passadas cheias",
+        impressions: 2274
+      }
+    ]
   };
 }
 

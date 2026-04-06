@@ -3,50 +3,30 @@ const router = express.Router();
 
 router.post('/analyze-ceo', async (req, res) => {
     try {
-        const { metrics, supplyChain } = req.body;
-        const apiKey = process.env.GOOGLE_API_KEY;
+        // Simular o delay de "pensamento" da IA para efeito de demonstração (2.5 segundos)
+        await new Promise(resolve => setTimeout(resolve, 2500));
 
-        if (!apiKey) {
-            return res.status(500).json({ error: 'Chave de API do Google não configurada no servidor.' });
-        }
+        const fakeReport = `
+**🎯 DIAGNÓSTICO EXECUTIVO (WAR ROOM)**
 
-        // Montagem do Prompt Especialista (Lean + TOC) - Curto e Direto
-        const prompt = `
-            Você é um consultor Sênior em Lean Manufacturing e Teoria das Restrições (TOC). 
-            Analise os dados industriais fictícios abaixo da fábrica CTIA e forneça uma análise CURTA, DIRETA e EM TÓPICOS.
-            FOCO: Ações práticas para melhorar a vazão e reduzir o Lead Time.
+Com base nos indicadores em tempo real, o algoritmo identificou anomalias na cadeia de valor que exigem intervenção imediata para proteger a margem operacional.
 
-            MÉTRICAS:
-            ${metrics.map(m => `- ${m.title}: ${m.value} (Tendência: ${m.trend}%)`).join('\n')}
+**⚠️ GARGALO CRÍTICO: PCP / Triagem**
+O WIP (Work in Progress) do PCP está **80% acima da capacidade máxima**, formando um "engarrafamento" com 45 ordens travadas. Isso afeta o *Lead Time* global em toda a planta.
+- **Ação Imediata (TOC):** Suspender a injeção de novas ordens (travar o início de novos pedidos) até que a fila atual do PCP escoe para abaixo de 15 itens. Realocar 2 auxiliares da Serigrafia para apoio temporário de expedição.
 
-            MAPA DA CADEIA:
-            ${supplyChain.map(n => `- ${n.title}: WIP ${n.wip}/${n.wipLimit}, Status: ${n.status}`).join('\n')}
+**💡 QUICK WIN (Vitória Rápida)**
+O setor de **Sublimação** está rodando com máxima Eficiência Financeira (Alta Receita / Baixo Custo). 
+- **Ação Recomendada:** Extrair o procedimento padrão (SOP) de "Setup Rápido" usado na Sublimação e replicá-lo hoje na Costura. Estimativa de retorno: +R$ 4.500 no caixa nos próximos 5 dias úteis ao reduzir tempo de máquina parada.
 
-            Responda em PORTUGUÊS brasileiro, usando Markdown. Seja incisivo. 
-            Priorize o gargalo identificado no mapa da cadeia.
-        `;
+**🚨 RISCO FINANCEIRO ESTRATÉGICO**
+Registramos um aumento atípico (2.1%) em refugo e retrabalho (Custo atual: **R$ 8.9K**). O desvio padrão sugere desgaste nas facas de corte contínuo.
+- **Ação Preventiva:** Agendar manutenção preditiva na linha de Corte no horário de baixo pico (almoço). O custo de 1 hora de parada programada será 75% menor que o impacto financeiro de continuar perdendo matéria-prima têxtil.
 
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: prompt }]
-                }]
-            })
-        });
+*Insights gerados cruzando gargalos logísticos com custos de operação.*
+        `.trim();
 
-        const data = await response.json();
-        
-        if (data.error) {
-            console.error('Gemini API Error:', data.error);
-            return res.status(data.error.code || 500).json({ error: data.error.message });
-        }
-
-        const aiResponse = data.candidates[0].content.parts[0].text;
-        res.json({ analysis: aiResponse });
+        res.json({ analysis: fakeReport });
 
     } catch (err) {
         console.error('Erro na análise IA:', err);
@@ -55,3 +35,4 @@ router.post('/analyze-ceo', async (req, res) => {
 });
 
 module.exports = router;
+
