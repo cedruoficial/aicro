@@ -5,7 +5,7 @@ import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Sear
 
 export function TPU() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'Todos' | 'Manual' | 'Rotativa'>('Todos');
+  const [filterType, setFilterType] = useState<'Todos' | 'Frequência' | 'Rotativa'>('Todos');
 
   // Filtragem e Agrupamento
   const groupedData = useMemo(() => {
@@ -87,7 +87,7 @@ export function TPU() {
         
         <div className="flex items-center bg-white rounded-xl border border-[#D1D0D9] p-1 w-full md:w-auto overflow-x-auto">
           <Filter size={14} className="text-[#A0A0B0] ml-2 mr-1" />
-          {(['Todos', 'Manual', 'Rotativa'] as const).map(f => (
+          {(['Todos', 'Frequência', 'Rotativa'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilterType(f)}
@@ -142,7 +142,7 @@ export function TPU() {
                   </div>
 
                   {/* CARTÕES DAS MÁQUINAS/REFERÊNCIAS */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
                     {group.jobs.map(job => <JobCard key={job.id} job={job} />)}
                   </div>
                 </div>
@@ -172,42 +172,41 @@ function JobCard({ job }: { job: TPUJob }) {
     <AlertCircle size={12} className="text-[#A0A0B0]" />;
 
   return (
-    <div className="bg-white rounded-2xl border border-[#EEEDF5] shadow-sm hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all overflow-hidden flex flex-col group">
+    <div className="bg-white rounded-xl border border-[#EEEDF5] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group">
       {/* CABEÇALHO DO CARTÃO */}
-      <div className={`p-4 border-b border-[#F4F3F8] flex justify-between items-start ${isRotativa ? 'bg-gradient-to-r from-[#FAFAFE] to-white' : ''}`}>
-        <div>
-           <div className="flex items-center gap-2 mb-1">
-             <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded text-[#2D2D3A] bg-[#EEEDF5]">
+      <div className={`p-3 border-b border-[#F4F3F8] flex justify-between items-start ${isRotativa ? 'bg-[#FAFAFE]' : ''}`}>
+        <div className="flex-1 min-w-0 pr-2">
+           <div className="flex items-center gap-1.5 mb-1 flex-wrap">
+             <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded text-[#2D2D3A] bg-[#EEEDF5]">
                {job.client}
              </span>
-             <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded border ${priorityColor}`}>
+             <span className={`text-[8px] font-black uppercase px-1.5 py-0.5 rounded border ${priorityColor}`}>
                {job.priority}
              </span>
            </div>
-           <h3 className="text-lg font-black text-[#1E1B4B] leading-tight">{job.reference}</h3>
+           <h3 className="text-base font-black text-[#1E1B4B] leading-none truncate" title={job.reference}>{job.reference}</h3>
         </div>
-        <div className="flex flex-col items-end">
-          <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2 py-1 rounded-lg ${isRotativa ? 'bg-[#6C5CE7] text-white shadow-md' : 'bg-[#1E1B4B] text-white shadow-md'}`}>
-            {isRotativa ? <Cpu size={12} /> : <Target size={12} />}
+        <div className="flex flex-col items-end shrink-0">
+          <div className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-wider px-2 py-1.5 rounded-lg ${isRotativa ? 'bg-[#6C5CE7] text-white' : 'bg-[#1E1B4B] text-white'}`}>
+            {isRotativa ? <Cpu size={10} /> : <Target size={10} />}
             {job.machineName}
           </div>
-          <span className="text-[10px] font-semibold text-[#A0A0B0] mt-1">{job.machineType}</span>
         </div>
       </div>
 
       {/* CORPO DO CARTÃO */}
-      <div className="p-4 flex-1 flex flex-col gap-3">
+      <div className="p-3 flex-1 flex flex-col gap-2.5">
         {/* Progresso de Produção */}
         <div>
           <div className="flex justify-between items-end mb-1">
-            <span className="text-xs font-bold text-[#6B6B80]">Produção (Und)</span>
+            <span className="text-[10px] font-bold text-[#6B6B80]">Produção</span>
             <span className="text-sm font-black text-[#1E1B4B]">
               <span className={progress === 100 ? 'text-[#00B894]' : ''}>{job.quantityProduced.toLocaleString()}</span> 
               <span className="text-[#A0A0B0] font-medium mx-1">/</span> 
               {job.quantityRequested.toLocaleString()}
             </span>
           </div>
-          <div className="w-full h-[6px] bg-[#EEEDF5] rounded-full overflow-hidden">
+          <div className="w-full h-[5px] bg-[#EEEDF5] rounded-full overflow-hidden">
             <div 
               className={`h-full rounded-full transition-all duration-1000 ${progress === 100 ? 'bg-[#00B894]' : isRotativa ? 'bg-[#6C5CE7]' : 'bg-[#1E1B4B]'}`}
               style={{ width: `${progress}%` }}
@@ -216,35 +215,34 @@ function JobCard({ job }: { job: TPUJob }) {
         </div>
 
         {/* Infos de Rodapé */}
-        <div className="flex justify-between items-center bg-[#F8F7FC] p-2.5 rounded-xl border border-[#EEEDF5] mt-auto">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-[#D1D0D9] flex items-center justify-center text-white">
-              <User size={12} />
+        <div className="flex justify-between items-center bg-[#F8F7FC] p-2 rounded-lg border border-[#EEEDF5] mt-auto">
+          <div className="flex items-center gap-1.5 min-w-0 pr-2">
+            <div className="w-5 h-5 rounded-full bg-[#D1D0D9] flex items-center justify-center text-white shrink-0">
+              <User size={10} />
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-[#8B8BA0] uppercase font-bold leading-none">Operadora</span>
-              <span className="text-xs font-bold text-[#2D2D3A]">{job.operator.name}</span>
+            <div className="flex flex-col truncate">
+              <span className="text-[9px] text-[#8B8BA0] uppercase font-bold leading-none truncate">Op</span>
+              <span className="text-[11px] font-bold text-[#2D2D3A] truncate">{job.operator.name}</span>
             </div>
           </div>
           
-          <div className="text-right flex flex-col items-end">
-            <div className="flex items-center gap-1">
-              <Clock size={10} className="text-[#8B8BA0]" />
-              <span className="text-[10px] text-[#8B8BA0] uppercase font-bold">Previsão</span>
+          <div className="text-right flex flex-col items-end shrink-0 pl-2">
+            <div className="flex items-center gap-1 text-[9px] text-[#8B8BA0] uppercase font-bold">
+              <Clock size={9} /> Previsão
             </div>
-            <span className="text-xs font-black text-[#2D2D3A]">{job.forecastEnd}</span>
+            <span className="text-[11px] font-black text-[#2D2D3A]">{job.forecastEnd}</span>
           </div>
         </div>
 
         {/* Status */}
-        <div className="flex items-center gap-1.5 justify-center mt-1">
+        <div className="flex items-center gap-1 justify-center mt-0.5">
           {statusIcon}
-          <span className="text-[11px] font-bold text-[#6B6B80]">{job.status}</span>
+          <span className="text-[10px] font-bold text-[#6B6B80]">{job.status}</span>
         </div>
         
         {/* Notas Adicionais */}
         {job.notes && (
-          <div className="mt-1 text-[11px] text-[#E17055] font-medium px-2 py-1 bg-[#E1705510] rounded-md border border-[#E1705530]">
+          <div className="mt-0.5 text-[9px] text-[#E17055] font-medium px-1.5 py-1 bg-[#E1705510] rounded border border-[#E1705530] leading-tight">
              <strong>Nota:</strong> {job.notes}
           </div>
         )}

@@ -1,4 +1,4 @@
-export type MachineType = 'Manual' | 'Rotativa';
+export type MachineType = 'Frequência' | 'Rotativa';
 export type JobPriority = 'Normal' | 'Urgente' | 'Atrasado';
 
 export interface TPUOperator {

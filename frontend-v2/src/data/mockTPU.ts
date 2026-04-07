@@ -1,89 +1,73 @@
-import type { TPUJob } from '../types/tpu';
+import type { TPUJob, MachineType, JobPriority } from '../types/tpu';
 
-export const MOCK_TPU_JOBS: TPUJob[] = [
-  {
-    id: 'tpu-1',
-    material: 'Etiqueta PU Alta Freq',
-    reference: 'REF-772A',
-    client: 'Dakota',
-    machineType: 'Manual',
-    machineName: 'Prensa 01',
-    operator: { id: 'op-1', name: 'Maria Silva' },
-    quantityRequested: 5000,
-    quantityProduced: 3200,
-    priority: 'Normal',
-    forecastEnd: '15:30',
-    status: 'Em Produção'
-  },
-  {
-    id: 'tpu-2',
-    material: 'Etiqueta PU Alta Freq',
-    reference: 'REF-772B',
-    client: 'Dakota',
-    machineType: 'Manual',
-    machineName: 'Prensa 02',
-    operator: { id: 'op-2', name: 'Joana Dark' },
-    quantityRequested: 3000,
-    quantityProduced: 2900,
-    priority: 'Normal',
-    forecastEnd: '14:00',
-    status: 'Em Produção'
-  },
-  {
-    id: 'tpu-3',
-    material: 'Transfer Sublimático',
-    reference: 'PED-9988',
-    client: 'Vulcabras',
-    machineType: 'Rotativa',
-    machineName: 'Rotativa Alpha',
-    operator: { id: 'op-3', name: 'Carlos Santos' },
-    quantityRequested: 15000,
-    quantityProduced: 4500,
-    priority: 'Urgente',
-    forecastEnd: '19:00',
-    status: 'Em Produção',
-    notes: 'Atenção na temperatura do rolo.'
-  },
-  {
-    id: 'tpu-4',
-    material: 'Transfer Sublimático',
-    reference: 'PED-9989',
-    client: 'Vulcabras',
-    machineType: 'Rotativa',
-    machineName: 'Rotativa Beta',
-    operator: { id: 'op-4', name: 'Ana Costa' },
-    quantityRequested: 8000,
-    quantityProduced: 8000,
-    priority: 'Normal',
-    forecastEnd: '11:00',
-    status: 'Concluído'
-  },
-  {
-    id: 'tpu-5',
-    material: 'Holográfico Star',
-    reference: 'REF-001X',
-    client: 'Bibi',
-    machineType: 'Manual',
-    machineName: 'Prensa 05',
-    operator: { id: 'op-5', name: 'Lucia Lima' },
-    quantityRequested: 1200,
-    quantityProduced: 300,
-    priority: 'Atrasado',
-    forecastEnd: '12:00',
-    status: 'Em Produção'
-  },
-  {
-    id: 'tpu-6',
-    material: 'Holográfico Star',
-    reference: 'REF-002Y',
-    client: 'Bibi',
-    machineType: 'Rotativa',
-    machineName: 'Rotativa Gama',
-    operator: { id: 'op-6', name: 'Marcos Paulo' },
-    quantityRequested: 22000,
-    quantityProduced: 0,
-    priority: 'Normal',
-    forecastEnd: 'Amanhã 10:00',
-    status: 'Aguardando'
+const generateMockData = (): TPUJob[] => {
+  const jobs: TPUJob[] = [];
+  const operators = ['Maria Silva', 'Joana Dark', 'Carlos Santos', 'Ana Costa', 'Lucia Lima', 'Marcos Paulo', 'Fernanda Souza', 'Rafael Mendes', 'Bruna Alves'];
+  const materials = ['TPU Flamengo', 'TPU Nike', 'TPU Adidas', 'TPU Puma', 'TPU Umbro'];
+  const clients = ['Bibi', 'Dakota', 'Vulcabras', 'Grendene', 'Beira Rio'];
+
+  let idCounter = 1;
+
+  for (let i = 1; i <= 35; i++) {
+    const isRotativa = i % 5 === 0;
+    const mType: MachineType = isRotativa ? 'Rotativa' : 'Frequência';
+    const mName = isRotativa ? `Rotativa ${String(Math.ceil(i/5)).padStart(2, '0')}` : `Frequência ${String(i).padStart(2, '0')}`;
+    const material = materials[i % materials.length];
+    const client = clients[i % clients.length];
+    
+    // Aleatórios para status
+    const statuses = ['Concluído', 'Em Produção', 'Aguardando', 'Pausado'] as const;
+    const status = statuses[i % statuses.length];
+    
+    // Aleatórios para prioridade
+    let priority: JobPriority = 'Normal';
+    if (i % 7 === 0) priority = 'Urgente';
+    if (i % 11 === 0) priority = 'Atrasado';
+
+    const qtyReq = 1000 + (idCounter * 500);
+    let qtyProd = 0;
+    if (status === 'Concluído') qtyProd = qtyReq;
+    else if (status === 'Em Produção') qtyProd = Math.floor(qtyReq * ((idCounter % 9) / 10 + 0.1));
+
+    jobs.push({
+      id: `tpu-${idCounter}`,
+      material,
+      reference: `REF-${2000 + idCounter}`,
+      client,
+      machineType: mType,
+      machineName: mName,
+      operator: { id: `op-${i % operators.length}`, name: operators[i % operators.length] },
+      quantityRequested: qtyReq,
+      quantityProduced: qtyProd,
+      priority,
+      forecastEnd: `${String(10 + (i % 8)).padStart(2, '0')}:${String((i * 15) % 60).padStart(2, '0')}`,
+      status,
+      notes: i % 8 === 0 ? 'Verificar nível da matriz.' : undefined
+    });
+    idCounter++;
   }
-];
+
+  // Adding a few more items to the same material to test grouping
+  for (let i = 1; i <= 10; i++) {
+    const material = materials[0]; // TPU Flamengo
+    jobs.push({
+      id: `tpu-${idCounter}`,
+      material,
+      reference: `REF-${3000 + idCounter}`,
+      client: 'Flamengo Oficial',
+      machineType: 'Frequência',
+      machineName: `Frequência ${String(30 + i).padStart(2, '0')}`,
+      operator: { id: `op-1`, name: operators[0] },
+      quantityRequested: 5000,
+      quantityProduced: 2500,
+      priority: 'Urgente',
+      forecastEnd: '16:00',
+      status: 'Em Produção'
+    });
+    idCounter++;
+  }
+
+  return jobs;
+};
+
+export const MOCK_TPU_JOBS: TPUJob[] = generateMockData();
