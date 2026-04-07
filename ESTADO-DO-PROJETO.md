@@ -69,8 +69,27 @@ Este documento centraliza todas as atualizações, melhorias e o status atual do
 - Relatórios Operacionais e **Análise Financeira** fundidos com análises gráficas.
 - **Análise Financeira**: Tradução de dados operacionais em custos reais usando indicadores Lean.
 
-### Fase 13: Identidade Visual e Navegação 🎨
-- Identidade "Grupo Cromotransfer / Plataforma Industrial".
+### Fase 14: Mobile Excellence & Branding 📱
+- **Otimização Responsiva**: Header totalmente adaptado para dispositivos móveis com menu hambúrguer (drawer) e busca em overlay.
+- **Identidade Visual Oficial**: Substituição do logo genérico pelo logo real do **Grupo Cromotransfer**, elevando o nível de profissionalismo da plataforma.
+- **Gestão de Perfil**: Adição de botão de conta com dropdown para visualização de setor e futura gestão de permissões.
+
+### Fase 15: RH Estratégico (Inspirado YouRH) 👥
+- **You Comunica (Mural)**: Widget de avisos internos, aniversariantes e alertas de segurança no topo do RH.
+- **You Performa (Desempenho)**: Timeline cronológica de feedbacks, elogios, promoções e advertências por colaborador.
+- **Recrutamento Inteligente**: Pipeline de contratação (Triagem até Contratação) conectado automaticamente à análise de gaps de competência dos setores.
+
+### Fase 16: Monitoramento de Materiais (Transit Timeline) 🚚
+- Implementação da **Timeline de Trânsito** em todas as páginas de processo (Arte, P&D, Produção), garantindo rastreabilidade do fluxo de materiais.
+
+### Fase 17: Infraestrutura de Rede Local 🌐
+- **Servidor V2**: Configuração de backend dedicado na porta 4000 para coexistência com sistema legado.
+- **Deploy Facilitado**: Criação de script `PUBLICAR_NA_REDE.bat` para automação de build e distribuição na rede interna.
+
+### Fase 18: Módulo de Produção TPU (Alta Frequência) 🏭
+- **Visão por Material e Referência**: Implementação de um dashboard focado em agilidade logística para máquinas manuais e rotativas.
+- **Smart Cards**: Cartões dinâmicos com progresso de produção (meta vs. real), identificação de operadora e alertas de notas técnicas.
+- **Filtros Avançados**: Sistema de busca e filtragem por tipo de máquina (Manual/Rotativa) para gestão de carga.
 
 ---
 
@@ -80,14 +99,14 @@ Este documento centraliza todas as atualizações, melhorias e o status atual do
 - [ ] **Deploy Vercel**: Realocar ambiente `frontend-v2` na nuvem integrando requisições Supabase.
 - [ ] **Integração Real**: Puxar dados live em OEE.
 - [ ] **Autenticação**: Construir JWT/RLS via gateway do Supabase.
-- [ ] **RH**: Modal "Novo Colaborador" e controle humano.
 
 ---
 
 ## 📂 Estrutura do Projeto
 - `organizador/frontend-v2/` — Sistema React (Vite + TS + Tailwind).
-- `organizador/server.js` — Backend Node.js (API + proxy).
+- `organizador/server-v2.js` — Servidor V2 (Porta 4000).
+- `organizador/server.js` — Backend Node.js (API + proxy legado).
 - `organizador/ctia.db` — Banco SQLite persistente (Atual).
 
 ---
-*Última atualização: 06 de Abril de 2026 — Integração PCP Calendar, Real-time Feed, CEO PDF Reports & Gemini Bypass Mock.*
+*Última atualização: 07 de Abril de 2026 — Lançamento do Módulo TPU (PCP por Material/Referência).*

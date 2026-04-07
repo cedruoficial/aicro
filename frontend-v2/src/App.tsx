@@ -4,6 +4,7 @@ import { PainelGeral } from './pages/PainelGeral';
 import { Insights } from './pages/Insights';
 import { PCP } from './pages/PCP';
 import { CEO } from './pages/CEO';
+import { TPU } from './pages/TPU';
 
 import { Comercial } from './pages/Comercial';
 import { SectorDetail } from './pages/SectorDetail';
@@ -26,6 +27,7 @@ export default function App() {
             <Route path="/dashboard" element={<Navigate to="/insights" replace />} />
             <Route path="/relatorios" element={<Navigate to="/insights" replace />} />
             <Route path="/pcp" element={<PCP />} />
+            <Route path="/tpu" element={<TPU />} />
             <Route path="/rh" element={<RH />} />
             <Route path="/ceo" element={<CEO />} />
             <Route path="*" element={<Navigate to="/home" replace />} />

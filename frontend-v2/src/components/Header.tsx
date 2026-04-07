@@ -27,6 +27,7 @@ const NAV_ITEMS = [
   { label: "Painel Geral", path: "/home",      icon: "🏠" },
   { label: "Comercial",    path: "/comercial",  icon: "🤝" },
   { label: "Insights",     path: "/insights",   icon: "📊" },
+  { label: "TPU",          path: "/tpu",        icon: "💠" },
   { label: "PCP",          path: "/pcp",        icon: "📅" },
   { label: "RH",           path: "/rh",         icon: "👥" },
 ];
