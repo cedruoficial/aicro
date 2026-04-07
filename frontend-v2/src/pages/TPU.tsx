@@ -1,11 +1,19 @@
 import { useState, useMemo } from 'react';
 import { MOCK_TPU_JOBS } from '../data/mockTPU';
 import type { TPUJob, TPUGroupedMaterial } from '../types/tpu';
-import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Search, Filter } from 'lucide-react';
+import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export function TPU() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'Todos' | 'Frequência' | 'Rotativa'>('Todos');
+  const [dayOffset, setDayOffset] = useState(0);
+  
+  const currentDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + dayOffset);
+    return d;
+  }, [dayOffset]);
+  const isToday = dayOffset === 0;
 
   // Filtragem e Agrupamento
   const groupedData = useMemo(() => {
@@ -83,6 +91,35 @@ export function TPU() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#D1D0D9] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6C5CE7] transition-all"
           />
+        </div>
+
+        {/* NAVEGADOR DE DATAS */}
+        <div className="flex items-center bg-white rounded-xl border border-[#D1D0D9] p-1 flex-1 md:flex-none justify-center">
+          <button
+            onClick={() => setDayOffset(d => d - 1)}
+            className="w-8 h-8 flex items-center justify-center text-[#6B6B80] hover:bg-[#F4F3F8] rounded-lg transition-all"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          
+          <button 
+            onClick={() => setDayOffset(0)}
+            className="px-4 h-8 flex items-center justify-center font-black text-sm tracking-wide hover:bg-[#F4F3F8] transition-all rounded-lg min-w-[140px]"
+            style={{ color: isToday ? '#6C5CE7' : '#2D2D3A' }}
+          >
+            {currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace(' de ', '/')}
+            {' '}
+            <span className="text-[10px] uppercase ml-2 px-1.5 py-0.5 bg-[#F4F3F8] rounded text-[#8B8BA0]">
+              {currentDate.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}
+            </span>
+          </button>
+          
+          <button
+            onClick={() => setDayOffset(d => d + 1)}
+            className="w-8 h-8 flex items-center justify-center text-[#6B6B80] hover:bg-[#F4F3F8] rounded-lg transition-all"
+          >
+            <ChevronRight size={18} />
+          </button>
         </div>
         
         <div className="flex items-center bg-white rounded-xl border border-[#D1D0D9] p-1 w-full md:w-auto overflow-x-auto">
