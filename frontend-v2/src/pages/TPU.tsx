@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { MOCK_TPU_JOBS } from '../data/mockTPU';
+import { getMockTpuJobs } from '../data/mockTPU';
 import type { TPUJob, TPUGroupedMaterial } from '../types/tpu';
 import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -14,10 +14,12 @@ export function TPU() {
     return d;
   }, [dayOffset]);
   const isToday = dayOffset === 0;
+  
+  const currentJobs = useMemo(() => getMockTpuJobs(dayOffset), [dayOffset]);
 
   // Filtragem e Agrupamento
   const groupedData = useMemo(() => {
-    let filtered = MOCK_TPU_JOBS;
+    let filtered = currentJobs;
     
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
@@ -45,12 +47,14 @@ export function TPU() {
     });
 
     return Array.from(groups.values());
-  }, [searchTerm, filterType]);
+  }, [currentJobs, searchTerm, filterType]);
 
-  const totalEmProducao = MOCK_TPU_JOBS.filter(j => j.status === 'Em Produção').length;
-  const producaoGeral = MOCK_TPU_JOBS.reduce((acc, obj) => acc + obj.quantityProduced, 0);
-  const metaGeral = MOCK_TPU_JOBS.reduce((acc, obj) => acc + obj.quantityRequested, 0);
+  const totalEmProducao = currentJobs.filter(j => j.status === 'Em Produção').length;
+  const producaoGeral = currentJobs.reduce((acc, obj) => acc + obj.quantityProduced, 0);
+  const metaGeral = currentJobs.reduce((acc, obj) => acc + obj.quantityRequested, 0);
   const progressoGeral = metaGeral > 0 ? (producaoGeral / metaGeral) * 100 : 0;
+
+  const dateLabel = dayOffset === 0 ? 'HOJE' : dayOffset === 1 ? 'AMANHÃ' : dayOffset === -1 ? 'ONTEM' : currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace(' de ', '/');
 
   return (
     <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F4F3F8] font-sans pb-10">
@@ -107,7 +111,7 @@ export function TPU() {
             className="px-4 h-8 flex items-center justify-center font-black text-sm tracking-wide hover:bg-[#F4F3F8] transition-all rounded-lg min-w-[140px]"
             style={{ color: isToday ? '#6C5CE7' : '#2D2D3A' }}
           >
-            {currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace(' de ', '/')}
+            {dateLabel}
             {' '}
             <span className="text-[10px] uppercase ml-2 px-1.5 py-0.5 bg-[#F4F3F8] rounded text-[#8B8BA0]">
               {currentDate.toLocaleDateString('pt-BR', { weekday: 'short' }).replace('.', '')}
@@ -258,7 +262,7 @@ function JobCard({ job }: { job: TPUJob }) {
               <User size={10} />
             </div>
             <div className="flex flex-col truncate">
-              <span className="text-[9px] text-[#8B8BA0] uppercase font-bold leading-none truncate">Op</span>
+              <span className="text-[9px] text-[#8B8BA0] uppercase font-bold leading-none truncate">{job.operator.shift}</span>
               <span className="text-[11px] font-bold text-[#2D2D3A] truncate">{job.operator.name}</span>
             </div>
           </div>

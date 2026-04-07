@@ -5,6 +5,7 @@ export interface TPUOperator {
   id: string;
   name: string;
   avatar?: string;
+  shift: string; // Ex: 'Turno 1', 'Turno 2'
 }
 
 export interface TPUJob {
