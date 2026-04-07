@@ -5,7 +5,7 @@ import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Sear
 
 export function TPU() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'Todos' | 'Frequência' | 'Rotativa'>('Todos');
+  const [filterType, setFilterType] = useState<'Todos' | 'Manual' | 'Rotativa'>('Todos');
   const [dayOffset, setDayOffset] = useState(0);
   
   const currentDate = useMemo(() => {
@@ -128,7 +128,7 @@ export function TPU() {
         
         <div className="flex items-center bg-white rounded-xl border border-[#D1D0D9] p-1 w-full md:w-auto overflow-x-auto">
           <Filter size={14} className="text-[#A0A0B0] ml-2 mr-1" />
-          {(['Todos', 'Frequência', 'Rotativa'] as const).map(f => (
+          {(['Todos', 'Manual', 'Rotativa'] as const).map(f => (
             <button
               key={f}
               onClick={() => setFilterType(f)}
@@ -202,20 +202,23 @@ function JobCard({ job }: { job: TPUJob }) {
   const isRotativa = job.machineType === 'Rotativa';
   const progress = job.quantityRequested > 0 ? (job.quantityProduced / job.quantityRequested) * 100 : 0;
   
+  const isAtrasado = job.priority === 'Atrasado';
+  const cardBg = isAtrasado ? 'bg-[#FFF4F4] border-[#FFDADA]' : 'bg-white border-[#EEEDF5]';
+
   const priorityColor = 
-    job.priority === 'Urgente' ? 'text-[#FF4757] bg-[#FF475715] border-[#FF475750]' :
-    job.priority === 'Atrasado' ? 'text-[#FDCB6E] bg-[#FDCB6E15] border-[#FDCB6E50]' :
+    job.priority === 'Urgente' ? 'text-[#F19066] bg-[#F1906615] border-[#F1906650]' :
+    isAtrasado ? 'text-[#E15F41] bg-[#E15F4115] border-[#E15F4150]' :
     'text-[#8B8BA0] bg-[#F4F3F8] border-transparent';
 
   const statusIcon = 
     job.status === 'Concluído' ? <CheckCircle2 size={12} className="text-[#00B894]" /> :
     job.status === 'Em Produção' ? <Zap size={12} className="text-[#6C5CE7]" /> :
-    <AlertCircle size={12} className="text-[#A0A0B0]" />;
+    <AlertCircle size={12} className={isAtrasado ? "text-[#E15F41]" : "text-[#A0A0B0]"} />;
 
   return (
-    <div className="bg-white rounded-xl border border-[#EEEDF5] shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group">
+    <div className={`${cardBg} rounded-xl border shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col group`}>
       {/* CABEÇALHO DO CARTÃO */}
-      <div className={`p-3 border-b border-[#F4F3F8] flex justify-between items-start ${isRotativa ? 'bg-[#FAFAFE]' : ''}`}>
+      <div className={`p-3 border-b ${isAtrasado ? 'border-[#FFDADA]' : 'border-[#F4F3F8]'} flex justify-between items-start ${isRotativa && !isAtrasado ? 'bg-[#FAFAFE]' : ''}`}>
         <div className="flex-1 min-w-0 pr-2">
            <div className="flex items-center gap-1.5 mb-1 flex-wrap">
              <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded text-[#2D2D3A] bg-[#EEEDF5]">
@@ -247,7 +250,7 @@ function JobCard({ job }: { job: TPUJob }) {
               {job.quantityRequested.toLocaleString()}
             </span>
           </div>
-          <div className="w-full h-[5px] bg-[#EEEDF5] rounded-full overflow-hidden">
+          <div className={`w-full h-[5px] ${isAtrasado ? 'bg-[#FFDADA]' : 'bg-[#EEEDF5]'} rounded-full overflow-hidden`}>
             <div 
               className={`h-full rounded-full transition-all duration-1000 ${progress === 100 ? 'bg-[#00B894]' : isRotativa ? 'bg-[#6C5CE7]' : 'bg-[#1E1B4B]'}`}
               style={{ width: `${progress}%` }}
@@ -256,7 +259,7 @@ function JobCard({ job }: { job: TPUJob }) {
         </div>
 
         {/* Infos de Rodapé */}
-        <div className="flex justify-between items-center bg-[#F8F7FC] p-2 rounded-lg border border-[#EEEDF5] mt-auto">
+        <div className={`flex justify-between items-center ${isAtrasado ? 'bg-[#FFF9F9] border-[#FFDADA]' : 'bg-[#F8F7FC] border-[#EEEDF5]'} p-2 rounded-lg border mt-auto`}>
           <div className="flex items-center gap-1.5 min-w-0 pr-2">
             <div className="w-5 h-5 rounded-full bg-[#D1D0D9] flex items-center justify-center text-white shrink-0">
               <User size={10} />
