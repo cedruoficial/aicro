@@ -59,33 +59,35 @@ export function TPU() {
   return (
     <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F4F3F8] font-sans pb-10">
       {/* HEADER PAGE */}
-      <div className="bg-white border-b border-[#E8E6F0] px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#1E1B4B] tracking-tight flex items-center gap-2">
-            <Factory className="text-[#6C5CE7]" size={26} />
-            PCP Fabril · TPU
-          </h1>
-          <p className="text-[#6B6B80] text-sm mt-1 font-medium">Controle focado em Materiais e Referências de Alta Frequência</p>
-        </div>
-
-        {/* MÉTRICAS GLOBAIS */}
-        <div className="flex items-center gap-4 bg-[#F8F7FC] p-2 rounded-2xl border border-[#EEEDF5]">
-          <div className="px-4 py-1 border-r border-[#E8E6F0]">
-            <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Visão Geral</div>
-            <div className="flex items-end gap-2">
-              <span className="text-lg font-black text-[#2D2D3A] leading-none">{progressoGeral.toFixed(1)}%</span>
-              <span className="text-xs text-[#00B894] font-bold mb-0.5">Hoje</span>
-            </div>
+      <div className="bg-white border-b border-[#E8E6F0] shrink-0">
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-black text-[#1E1B4B] tracking-tight flex items-center gap-2">
+              <Factory className="text-[#6C5CE7]" size={26} />
+              PCP Fabril · TPU
+            </h1>
+            <p className="text-[#6B6B80] text-sm mt-1 font-medium">Controle focado em Materiais e Referências de Alta Frequência</p>
           </div>
-          <div className="px-4 py-1">
-             <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Batidas Ativas</div>
-             <div className="text-lg font-black text-[#6C5CE7] leading-none">{totalEmProducao}</div>
+
+          {/* MÉTRICAS GLOBAIS */}
+          <div className="flex items-center gap-4 bg-[#F8F7FC] p-2 rounded-2xl border border-[#EEEDF5]">
+            <div className="px-4 py-1 border-r border-[#E8E6F0]">
+              <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Visão Geral</div>
+              <div className="flex items-end gap-2">
+                <span className="text-lg font-black text-[#2D2D3A] leading-none">{progressoGeral.toFixed(1)}%</span>
+                <span className="text-xs text-[#00B894] font-bold mb-0.5">Hoje</span>
+              </div>
+            </div>
+            <div className="px-4 py-1">
+               <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Batidas Ativas</div>
+               <div className="text-lg font-black text-[#6C5CE7] leading-none">{totalEmProducao}</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* CONTROLES */}
-      <div className="px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="max-w-[1440px] mx-auto w-full px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-[320px]">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A0A0B0]" />
           <input 
@@ -143,7 +145,7 @@ export function TPU() {
       </div>
 
       {/* LISTA AGRUPADA POR MATERIAL */}
-      <div className="px-6 lg:px-8 flex-1">
+      <div className="max-w-[1440px] mx-auto w-full px-6 lg:px-8 flex-1">
         {groupedData.length === 0 ? (
           <div className="text-center py-20">
              <Factory size={48} className="mx-auto text-[#D1D0D9] mb-4" />
@@ -183,7 +185,7 @@ export function TPU() {
                   </div>
 
                   {/* CARTÕES DAS MÁQUINAS/REFERÊNCIAS */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {group.jobs.map(job => <JobCard key={job.id} job={job} />)}
                   </div>
                 </div>

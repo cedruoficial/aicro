@@ -124,7 +124,7 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0]">Operação / Tinta</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-center w-16">Tela</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right">Nec. Prevista</th>
-                  <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0]">SETUP DE PASSADAS</th>
+                  <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0]">QNT PASSADAS</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right w-24">Impressões</th>
                 </tr>
               </thead>
@@ -153,16 +153,14 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                       </div>
                     </td>
                     <td className="py-4 px-4 align-top">
-                      <div className="flex items-start gap-3">
-                        <div className="flex flex-col gap-1 min-w-[120px]">
-                          <div className="flex items-center gap-2 text-[12px] font-black text-[#6B6B80]">
-                            <Layers size={14} className="text-[#A0A0B0] shrink-0" />
-                            {op.passesInfo}
-                          </div>
+                      <div className="flex items-start gap-4">
+                        <div className="flex items-center gap-2 text-[12px] font-black text-[#6B6B80] min-w-[50px] mt-2">
+                          <Layers size={14} className="text-[#A0A0B0] shrink-0" />
+                          {op.passesInfo}
                         </div>
 
                         {/* Pass Checkboxes integrated here */}
-                        <div className="flex items-start gap-3 ml-2 border-l border-[#EEEDF5] pl-4">
+                        <div className="flex items-start gap-3 border-l border-[#EEEDF5] pl-4">
                           {states.map((st, idx) => (
                             <div key={idx} className="flex flex-col items-center gap-1">
                               <button
@@ -299,7 +297,7 @@ export function PCP() {
       
       {/* ── TOP BAR (Nav & Controls) ─────────────────────────────────────────── */}
       <div className="bg-white border-b border-[#EEEDF5] shrink-0">
-        <div className="px-8 py-3 flex items-center justify-between">
+        <div className="px-6 lg:px-8 max-w-[1440px] mx-auto w-full flex items-center justify-between py-3">
           <div className="flex items-center gap-6">
             <div>
               <h1 className="text-xl font-black text-[#2D2D3A] tracking-tight">Timeline da Fábrica</h1>

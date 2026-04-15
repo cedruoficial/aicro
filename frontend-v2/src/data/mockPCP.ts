@@ -79,7 +79,7 @@ function makeBlock(
         description: `M${String(refNum + 300000).padStart(6, '0')} - VERDE GEODE TEAL 3ND`,
         screen: "90",
         inkNeeded: 2.156,
-        passesInfo: "2x (Monte 1), 1x (Demais)",
+        passesInfo: "2x",
         impressions: 2287
       },
       {
