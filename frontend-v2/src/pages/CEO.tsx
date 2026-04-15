@@ -110,7 +110,7 @@ export function CEO() {
           })}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-8">
+        <div className="grid grid-cols-1 gap-8">
           <div className="flex flex-col gap-8">
             {/* ÁREA 2: MAPA DA CADEIA PRODUTIVA (TOC) */}
             <div className="bg-[#1A1825] border border-[#2D2B3A] rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.2)]">
@@ -176,8 +176,9 @@ export function CEO() {
               </div>
             </div>
 
-            {/* ÁREA 3: ANÁLISES DE PERDAS (Lean Muda) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* ÁREA 3: ANÁLISES DE PERDAS (Lean Muda) & ALERTAS */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* 7 Desperdícios */}
               <div className="bg-[#1A1825] border border-[#2D2B3A] rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.2)]">
                 <h2 className="text-base font-bold flex items-center gap-2 mb-6">7 Desperdícios (Custos Ocultos)</h2>
                 {/* Mocked Muda bars */}
@@ -201,63 +202,46 @@ export function CEO() {
                 </div>
               </div>
               
-              <div className="bg-[#1A1825] border border-[#2D2B3A] rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.2)] flex flex-col justify-center items-center relative text-center">
-                <div className="w-16 h-16 rounded-2xl bg-[#6C5CE720] flex items-center justify-center mb-4">
-                  <TrendingUp size={32} className="text-[#6C5CE7]" />
+              {/* ÁREA 4: ALERTAS ESTRATÉGICOS (Inteligência de Operação) */}
+              <div className="bg-[#1A1825] border border-[#2D2B3A] rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.2)] flex flex-col">
+                <h2 className="text-base font-bold flex items-center gap-2 mb-6 text-[#A0A0B0] uppercase tracking-wider text-xs">
+                  <AlertCircle size={14} className="text-[#FDCB6E]"/>
+                  Inteligência de Operação
+                </h2>
+
+                <div className="space-y-3 flex-1">
+                  {/* Alert Card 1 */}
+                  <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#FF4757] hover:bg-[#2A283A] transition-colors cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-[10px] font-black uppercase text-[#FF4757] bg-[#FF475715] px-2 py-0.5 rounded">Gargalo Crítico</span>
+                      <span className="text-[10px] text-[#6B6B80] font-bold">Agora</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white leading-tight mb-1">PCP com 45 itens parados</h4>
+                    <p className="text-[11px] text-[#A0A0B0] leading-snug">Volume está 80% acima do limite de WIP. Produção de Aniger afetada diretamente.</p>
+                  </div>
+
+                  {/* Alert Card 2 */}
+                  <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#FDCB6E] hover:bg-[#2A283A] transition-colors cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-[10px] font-black uppercase text-[#FDCB6E] bg-[#FDCB6E15] px-2 py-0.5 rounded">OEE Abaixo</span>
+                      <span className="text-[10px] text-[#6B6B80] font-bold">Há 2h</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white leading-tight mb-1">Performance da Linha 3 (Laser) nula.</h4>
+                    <p className="text-[11px] text-[#A0A0B0] leading-snug">Máquina entrou em manutenção imprevista afetando Lead Time geral.</p>
+                  </div>
+
+                  {/* Alert Card 3 */}
+                  <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#00B894] hover:bg-[#2A283A] transition-colors cursor-pointer">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="text-[10px] font-black uppercase text-[#00B894] bg-[#00B89415] px-2 py-0.5 rounded">Meta Batida</span>
+                      <span className="text-[10px] text-[#6B6B80] font-bold">Hoje</span>
+                    </div>
+                    <h4 className="text-sm font-bold text-white leading-tight mb-1">Faturamento Mensal Alcançado</h4>
+                    <p className="text-[11px] text-[#A0A0B0] leading-snug">Acabamos de atingir a marca de 104% da meta projetada. Excelente trabalho contínuo.</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-black mb-2">Kaizen & Melhoria Contínua</h3>
-                <p className="text-sm text-[#8B8BA0] px-4 font-medium mb-4">
-                  Existem <strong className="text-white">3 projetos de eficiência</strong> rodando hoje para reduzir setup no PCP.
-                </p>
-                <button className="bg-[#2D2B3A] hover:bg-[#3D3B4A] text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors border border-[#4D4B5A]">
-                  Acompanhar A3 Kaizen
-                </button>
               </div>
             </div>
-          </div>
-
-          {/* ÁREA 4: ALERTAS ESTRATÉGICOS */}
-          <div className="bg-[#1A1825] border border-[#2D2B3A] rounded-2xl p-6 shadow-[0_8px_24px_rgba(0,0,0,0.2)] flex flex-col h-full">
-            <h2 className="text-base font-bold flex items-center gap-2 mb-6 text-[#A0A0B0] uppercase tracking-wider text-xs">
-              <AlertCircle size={14} className="text-[#FDCB6E]"/>
-              Inteligência de Operação
-            </h2>
-
-            <div className="space-y-4 flex-1">
-              {/* Alert Card 1 */}
-              <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#FF4757] hover:bg-[#2A283A] transition-colors cursor-pointer">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-[10px] font-black uppercase text-[#FF4757] bg-[#FF475715] px-2 py-0.5 rounded">Gargalo Crítico</span>
-                  <span className="text-[10px] text-[#6B6B80] font-bold">Agora</span>
-                </div>
-                <h4 className="text-sm font-bold text-white leading-tight mb-1">PCP com 45 itens parados</h4>
-                <p className="text-[11px] text-[#A0A0B0] leading-snug">Volume está 80% acima do limite de WIP. Produção de Aniger afetada diretamente.</p>
-              </div>
-
-              {/* Alert Card 2 */}
-              <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#FDCB6E] hover:bg-[#2A283A] transition-colors cursor-pointer">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-[10px] font-black uppercase text-[#FDCB6E] bg-[#FDCB6E15] px-2 py-0.5 rounded">OEE Abaixo</span>
-                  <span className="text-[10px] text-[#6B6B80] font-bold">Há 2h</span>
-                </div>
-                <h4 className="text-sm font-bold text-white leading-tight mb-1">Performance da Linha 3 (Laser) nula.</h4>
-                <p className="text-[11px] text-[#A0A0B0] leading-snug">Máquina entrou em manutenção imprevista afetando Lead Time geral.</p>
-              </div>
-
-              {/* Alert Card 3 */}
-              <div className="bg-[#222030] p-4 rounded-xl border-l-[3px] border-[#00B894] hover:bg-[#2A283A] transition-colors cursor-pointer">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-[10px] font-black uppercase text-[#00B894] bg-[#00B89415] px-2 py-0.5 rounded">Meta Batida</span>
-                  <span className="text-[10px] text-[#6B6B80] font-bold">Hoje</span>
-                </div>
-                <h4 className="text-sm font-bold text-white leading-tight mb-1">Faturamento Mensal Alcançado</h4>
-                <p className="text-[11px] text-[#A0A0B0] leading-snug">Acabamos de atingir a marca de 104% da meta projetada. Excelente trabalho contínuo.</p>
-              </div>
-            </div>
-            
-            <button className="w-full py-3 mt-4 text-[#A0A0B0] text-xs font-bold hover:text-white bg-[#222030] rounded-xl transition-colors border border-[#2D2B3A]">
-              Ver Histórico de Alertas
-            </button>
           </div>
         </div>
       </div>
