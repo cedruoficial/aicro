@@ -66,8 +66,8 @@ export const getMockTpuJobs = (dayOffset: number): TPUJob[] => {
 
     jobs.push({
       id: `tpu-day${dayOffset}-${idCounter}`,
-      material,
-      reference: `REF-${2000 + idCounter + Math.abs(dayOffset * 10)}`,
+      material: `M${String(idCounter + 200000).padStart(6, '0')} - ${material}`,
+      reference: `E${String(idCounter + 100000).padStart(6, '0')}`,
       client,
       machineType: mType,
       machineName: mName,
@@ -94,8 +94,8 @@ export const getMockTpuJobs = (dayOffset: number): TPUJob[] => {
 
     jobs.push({
       id: `tpu-day${dayOffset}-${idCounter}`,
-      material,
-      reference: `REF-${3000 + idCounter + Math.abs(dayOffset * 10)}`,
+      material: `M${String(idCounter + 200000).padStart(6, '0')} - ${material}`,
+      reference: `E${String(idCounter + 100000).padStart(6, '0')}`,
       client: 'Flamengo Oficial',
       machineType: 'Frequência',
       machineName: `Frequência ${String(30 + i).padStart(2, '0')}`,

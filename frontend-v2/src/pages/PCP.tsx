@@ -54,11 +54,16 @@ function getNowOffset(): number {
 // ─── Modal com a Ordem de Produção (Passadas e Tintas) ────────────────────────
 function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: () => void }) {
   const colors = CLIENT_COLORS[block.client] || { bg: '#A0A0B0', text: '#FFFFFF', shadow: '#A0A0B040', border: '#8A8A9A' };
+  const [confirmedOps, setConfirmedOps] = useState<Record<string, boolean>>({});
+
+  const toggleConfirm = (opId: string) => {
+    setConfirmedOps(prev => ({ ...prev, [opId]: !prev[opId] }));
+  };
   
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl flex flex-col h-auto max-h-[90vh] overflow-hidden animate-in zoom-in-95">
+      <div className="relative bg-white rounded-3xl w-full max-w-5xl shadow-2xl flex flex-col h-auto max-h-[90vh] overflow-hidden animate-in zoom-in-95">
         
         {/* Header Colorido da Ordem */}
         <div className="px-8 py-6 shrink-0 relative" style={{ background: colors.bg, color: colors.text }}>
@@ -94,15 +99,18 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right">Nec. Prevista</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0]">Setup de Montagem</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right w-24">Impressões</th>
+                  <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-center w-32">Confirmação</th>
                 </tr>
               </thead>
               <tbody>
-                {block.operations ? block.operations.map((op) => (
-                  <tr key={op.id} className="border-b border-[#EEEDF5] last:border-b-0 hover:bg-[#FAFAFC] transition-colors">
+                {block.operations ? block.operations.map((op) => {
+                  const isConfirmed = confirmedOps[op.id];
+                  return (
+                  <tr key={op.id} className={`border-b border-[#EEEDF5] last:border-b-0 transition-colors ${isConfirmed ? 'bg-green-50/50' : 'hover:bg-[#FAFAFC]'}`}>
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-start gap-2.5">
-                        <Droplet size={16} className="text-[#6C5CE7] mt-0.5 shrink-0" />
-                        <span className="text-[12px] font-bold text-[#2D2D3A] uppercase tracking-tight">{op.description}</span>
+                        <Droplet size={16} className={`mt-0.5 shrink-0 ${isConfirmed ? 'text-green-500' : 'text-[#6C5CE7]'}`} />
+                        <span className={`text-[12px] font-bold uppercase tracking-tight ${isConfirmed ? 'text-green-700' : 'text-[#2D2D3A]'}`}>{op.description}</span>
                       </div>
                     </td>
                     <td className="py-4 px-4 align-top text-center">
@@ -111,7 +119,9 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                       </span>
                     </td>
                     <td className="py-4 px-4 align-top text-right">
-                      <div className="text-[13px] font-black text-[#00B894]">{op.inkNeeded.toFixed(3)} kg</div>
+                      <div className={`text-[13px] font-black ${isConfirmed ? 'text-green-600' : 'text-[#00B894]'}`}>
+                        {Math.min(op.inkNeeded, 3.0).toFixed(3)} kg
+                      </div>
                     </td>
                     <td className="py-4 px-4 align-top">
                       <div className="flex items-start gap-2 text-[12px] font-medium text-[#6B6B80] leading-snug">
@@ -125,10 +135,22 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                         {op.impressions}
                       </div>
                     </td>
+                    <td className="py-4 px-4 align-top text-center">
+                      <button 
+                        onClick={() => toggleConfirm(op.id)}
+                        className={`px-3 py-1.5 rounded-xl text-[10px] font-black transition-all flex items-center gap-1.5 mx-auto border-2 ${
+                          isConfirmed 
+                          ? 'bg-green-500 border-green-500 text-white' 
+                          : 'bg-white border-[#EEEDF5] text-[#8B8BA0] hover:border-[#00B894] hover:text-[#00B894]'
+                        }`}
+                      >
+                        {isConfirmed ? 'CONCLUÍDO' : 'CONFIRMAR'}
+                      </button>
+                    </td>
                   </tr>
-                )) : (
+                )}) : (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-sm font-medium text-[#A0A0B0]">
+                    <td colSpan={6} className="py-8 text-center text-sm font-medium text-[#A0A0B0]">
                       Nenhuma especificação de tinta atrelada a esta Ordem.
                     </td>
                   </tr>

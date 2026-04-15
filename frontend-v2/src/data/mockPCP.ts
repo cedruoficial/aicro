@@ -65,9 +65,9 @@ function makeBlock(
   const pr = PRODUCTS[(refNum * 3 + parseInt(machineId.slice(-2), 10)) % PRODUCTS.length];
   return {
     id: `blk-${++_blockId}`,
-    reference: `PED-2026-${String(refNum).padStart(4, '0')}`,
+    reference: `E${String(refNum + 100000).padStart(6, '0')}`,
     client: cl,
-    product: pr,
+    product: `M${String(refNum + 200000).padStart(6, '0')} - ${pr}`,
     machineId,
     programadoInicio: d(date, hStart),
     programadoFim: d(date, hEnd),
@@ -76,26 +76,26 @@ function makeBlock(
     operations: [
       {
         id: `op-${_blockId}-1`,
-        description: "03466 - VERDE GEODE TEAL 3ND NIKE BASE",
+        description: `M${String(refNum + 300000).padStart(6, '0')} - VERDE GEODE TEAL 3ND`,
         screen: "90",
-        inkNeeded: 66.156,
-        passesInfo: "Monte 1 tem 2 passadas. Montes 2 a 6 tem uma passada.",
+        inkNeeded: 2.156,
+        passesInfo: "2x (Monte 1), 1x (Demais)",
         impressions: 2287
       },
       {
         id: `op-${_blockId}-2`,
-        description: "00493 - BRANCO BA CROMO EVO",
+        description: `M${String(refNum + 300001).padStart(6, '0')} - BRANCO BA CROMO EVO`,
         screen: "77",
-        inkNeeded: 115.845,
-        passesInfo: "Passada única",
+        inkNeeded: 1.845,
+        passesInfo: "1x",
         impressions: 2195
       },
       {
         id: `op-${_blockId}-3`,
-        description: "00001 - BLOCK EVO CAT.1%157+1%CARBO",
+        description: `M${String(refNum + 300002).padStart(6, '0')} - BLOCK EVO CAT.1%157`,
         screen: "44",
-        inkNeeded: 212.112,
-        passesInfo: "3 passadas cheias",
+        inkNeeded: 2.912,
+        passesInfo: "3x",
         impressions: 2274
       }
     ]
