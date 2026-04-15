@@ -1,6 +1,6 @@
 import { CEO_METRICS, SUPPLY_CHAIN } from '../data/mockCEO';
 import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
-import { ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, AlertCircle, TrendingUp, Sparkles } from 'lucide-react';
+import { ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, AlertCircle, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { AIAnalysisModal } from '../components/AIAnalysisModal';
 import { MOCK_AI_REPORT } from '../data/mockAI';
