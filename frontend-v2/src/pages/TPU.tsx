@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getMockTpuJobs } from '../data/mockTPU';
 import type { TPUJob, TPUGroupedMaterial } from '../types/tpu';
 import { Target, AlertCircle, Clock, Zap, CheckCircle2, User, Factory, Cpu, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,6 +7,7 @@ export function TPU() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<'Todos' | 'Manual' | 'Rotativa'>('Todos');
   const [dayOffset, setDayOffset] = useState(0);
+  const [jobs, setJobs] = useState<TPUJob[]>([]);
   
   const currentDate = useMemo(() => {
     const d = new Date();
@@ -15,11 +16,35 @@ export function TPU() {
   }, [dayOffset]);
   const isToday = dayOffset === 0;
   
-  const currentJobs = useMemo(() => getMockTpuJobs(dayOffset), [dayOffset]);
+  // Initialize and Update Jobs
+  useEffect(() => {
+    setJobs(getMockTpuJobs(dayOffset));
+  }, [dayOffset]);
+
+  // Real-time Simulation (Increments every 4 seconds)
+  useEffect(() => {
+    if (!isToday) return;
+
+    const interval = setInterval(() => {
+      setJobs(current => current.map(job => {
+        if (job.status === 'Em Produção' && job.quantityProduced < job.quantityRequested) {
+          const increment = Math.floor(Math.random() * 5) + 1;
+          return {
+            ...job,
+            quantityProduced: Math.min(job.quantityProduced + increment, job.quantityRequested),
+            status: job.quantityProduced + increment >= job.quantityRequested ? 'Concluído' : 'Em Produção'
+          };
+        }
+        return job;
+      }));
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [isToday]);
 
   // Filtragem e Agrupamento
   const groupedData = useMemo(() => {
-    let filtered = currentJobs;
+    let filtered = jobs;
     
     if (searchTerm) {
       const lowerSearch = searchTerm.toLowerCase();
@@ -47,11 +72,11 @@ export function TPU() {
     });
 
     return Array.from(groups.values());
-  }, [currentJobs, searchTerm, filterType]);
+  }, [jobs, searchTerm, filterType]);
 
-  const totalEmProducao = currentJobs.filter(j => j.status === 'Em Produção').length;
-  const producaoGeral = currentJobs.reduce((acc, obj) => acc + obj.quantityProduced, 0);
-  const metaGeral = currentJobs.reduce((acc, obj) => acc + obj.quantityRequested, 0);
+  const totalEmProducao = jobs.filter(j => j.status === 'Em Produção').length;
+  const producaoGeral = jobs.reduce((acc, obj) => acc + obj.quantityProduced, 0);
+  const metaGeral = jobs.reduce((acc, obj) => acc + obj.quantityRequested, 0);
   const progressoGeral = metaGeral > 0 ? (producaoGeral / metaGeral) * 100 : 0;
 
   const dateLabel = dayOffset === 0 ? 'HOJE' : dayOffset === 1 ? 'AMANHÃ' : dayOffset === -1 ? 'ONTEM' : currentDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace(' de ', '/');
@@ -60,34 +85,36 @@ export function TPU() {
     <div className="flex flex-col min-h-[calc(100vh-64px)] bg-[#F4F3F8] font-sans pb-10">
       {/* HEADER PAGE */}
       <div className="bg-white border-b border-[#E8E6F0] shrink-0">
-        <div className="max-w-[1440px] mx-auto px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-black text-[#1E1B4B] tracking-tight flex items-center gap-2">
-              <Factory className="text-[#6C5CE7]" size={26} />
-              PCP Fabril · TPU
-            </h1>
-            <p className="text-[#6B6B80] text-sm mt-1 font-medium">Controle focado em Materiais e Referências de Alta Frequência</p>
+        <div className="max-w-full mx-auto px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+             <div className="w-12 h-12 rounded-2xl bg-[#6C5CE7] flex items-center justify-center shadow-lg shadow-[#6C5CE730]">
+                <Factory className="text-white" size={26} />
+             </div>
+             <div>
+                <h1 className="text-2xl font-black text-[#1E1B4B] tracking-tight">PCP Fabril · TPU</h1>
+                <p className="text-[#6B6B80] text-[11px] font-bold uppercase tracking-wider">Monitoramento em Tempo Real (4s)</p>
+             </div>
           </div>
 
           {/* MÉTRICAS GLOBAIS */}
           <div className="flex items-center gap-4 bg-[#F8F7FC] p-2 rounded-2xl border border-[#EEEDF5]">
             <div className="px-4 py-1 border-r border-[#E8E6F0]">
-              <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Visão Geral</div>
+              <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">OEE Hoje</div>
               <div className="flex items-end gap-2">
-                <span className="text-lg font-black text-[#2D2D3A] leading-none">{progressoGeral.toFixed(1)}%</span>
-                <span className="text-xs text-[#00B894] font-bold mb-0.5">Hoje</span>
+                <span className="text-xl font-black text-[#2D2D3A] leading-none">{progressoGeral.toFixed(1)}%</span>
+                <span className="text-[10px] text-[#00CEC9] font-black uppercase tracking-tighter mb-0.5">Live</span>
               </div>
             </div>
             <div className="px-4 py-1">
-               <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Batidas Ativas</div>
-               <div className="text-lg font-black text-[#6C5CE7] leading-none">{totalEmProducao}</div>
+               <div className="text-[10px] font-bold text-[#8B8BA0] uppercase tracking-wider mb-0.5">Ativas (Simulação)</div>
+               <div className="text-xl font-black text-[#6C5CE7] leading-none">{totalEmProducao}</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* CONTROLES */}
-      <div className="max-w-[1440px] mx-auto w-full px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="max-w-full mx-auto w-full px-6 lg:px-8 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="relative w-full md:w-[320px]">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A0A0B0]" />
           <input 
@@ -153,41 +180,40 @@ export function TPU() {
              <p className="text-[#8B8BA0]">Tente alterar os filtros ou a busca.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 4xl:grid-cols-5 gap-3 items-start">
             {groupedData.map((group) => {
               const groupProgress = group.totalRequested > 0 ? (group.totalProduced / group.totalRequested) * 100 : 0;
               
               return (
-                <div key={group.materialName} className="bg-white/40 border border-[#EEEDF5] rounded-3xl p-5 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col h-full">
-                  {/* HEADER DO GRUPO - Mais Compacto */}
-                  <div className="flex items-center justify-between border-b border-[#D1D0D9]/50 pb-3 mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-[#1E1B4B] flex items-center justify-center shadow-lg shrink-0">
-                         <Target className="text-white" size={16} />
+                <div key={group.materialName} className="bg-white border border-[#EEEDF5] rounded-2xl p-3 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col h-full bg-gradient-to-b from-white to-[#F8F7FC]">
+                  {/* HEADER DO GRUPO - Ultra Compacto */}
+                  <div className="flex items-center justify-between border-b border-[#D1D0D9]/50 pb-2 mb-3">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded-lg bg-[#1E1B4B] flex items-center justify-center shadow-md grow-0 shrink-0">
+                         <Target className="text-white" size={12} />
                       </div>
-                      <h2 className="text-lg font-black text-[#1E1B4B] truncate max-w-[200px]" title={group.materialName}>
+                      <h2 className="text-xs font-black text-[#1E1B4B] truncate" title={group.materialName}>
                         {group.materialName}
                       </h2>
                     </div>
                     
-                    <div className="flex items-center gap-3 bg-white/80 px-3 py-1.5 rounded-2xl border border-[#EEEDF5]">
+                    <div className="flex items-center gap-2 px-2 py-1 bg-white rounded-xl border border-[#EEEDF5] shrink-0">
                       <div className="text-right">
-                        <div className="text-[9px] font-black uppercase text-[#8B8BA0]">Progresso</div>
-                        <div className="text-xs font-black text-[#2D2D3A]">
-                          {group.totalProduced} / {group.totalRequested}
+                        <div className="text-[10px] font-black text-[#2D2D3A]">
+                          {Math.floor(groupProgress)}%
                         </div>
                       </div>
-                      <div className="w-12 h-1.5 bg-[#E8E6F0] rounded-full overflow-hidden">
+                      <div className="w-8 h-1 bg-[#E8E6F0] rounded-full overflow-hidden">
                          <div 
-                           className="h-full bg-gradient-to-r from-[#6C5CE7] to-[#00CEC9] rounded-full" 
+                           className="h-full bg-gradient-to-r from-[#6C5CE7] to-[#00CEC9] rounded-full transition-all duration-1000" 
                            style={{ width: `${groupProgress}%` }}
                          />
                       </div>
                     </div>
                   </div>
 
-                  {/* GRID INTERNO DO GRUPO - Lado a Lado tbm */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {/* GRID INTERNO DO GRUPO */}
+                  <div className="grid grid-cols-1 gap-2">
                     {group.jobs.map(job => <JobCard key={job.id} job={job} />)}
                   </div>
                 </div>
