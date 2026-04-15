@@ -76,7 +76,7 @@ function makeBlock(
     operations: [
       {
         id: `op-${_blockId}-1`,
-        description: `M${String(refNum + 300000).padStart(6, '0')} - VERDE GEODE TEAL 3ND`,
+        description: `${String(refNum + 3100).padStart(5, '0')} - VERDE GEODE TEAL 3ND`,
         screen: "90",
         inkNeeded: 2.156,
         passesInfo: "2x",
@@ -84,7 +84,7 @@ function makeBlock(
       },
       {
         id: `op-${_blockId}-2`,
-        description: `M${String(refNum + 300001).padStart(6, '0')} - BRANCO BA CROMO EVO`,
+        description: `${String(refNum + 3101).padStart(5, '0')} - BRANCO BA CROMO EVO`,
         screen: "77",
         inkNeeded: 1.845,
         passesInfo: "1x",
@@ -92,7 +92,7 @@ function makeBlock(
       },
       {
         id: `op-${_blockId}-3`,
-        description: `M${String(refNum + 300002).padStart(6, '0')} - BLOCK EVO CAT.1%157`,
+        description: `${String(refNum + 3102).padStart(5, '0')} - BLOCK EVO CAT.1%157`,
         screen: "44",
         inkNeeded: 2.912,
         passesInfo: "3x",
