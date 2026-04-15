@@ -55,24 +55,29 @@ function getNowOffset(): number {
 function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: () => void }) {
   const colors = CLIENT_COLORS[block.client] || { bg: '#A0A0B0', text: '#FFFFFF', shadow: '#A0A0B040', border: '#8A8A9A' };
   
-  // State to track multiple passes per operation: Record<OpId, boolean[]>
-  const [confirmedPasses, setConfirmedPasses] = useState<Record<string, boolean[]>>({});
+  // State to track passes: Record<OpId, { confirmed: boolean; time?: string }[]>
+  const [confirmedPasses, setConfirmedPasses] = useState<Record<string, { confirmed: boolean; time?: string }[]>>({});
 
   const togglePass = (opId: string, passIdx: number, totalPasses: number) => {
     setConfirmedPasses(prev => {
-      const current = prev[opId] || Array(totalPasses).fill(false);
+      const current = prev[opId] || Array(totalPasses).fill(null).map(() => ({ confirmed: false }));
       const next = [...current];
-      next[passIdx] = !next[passIdx];
+      const isConfirming = !next[passIdx].confirmed;
+      
+      next[passIdx] = { 
+        confirmed: isConfirming,
+        time: isConfirming 
+          ? new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) 
+          : undefined 
+      };
+      
       return { ...prev, [opId]: next };
     });
   };
 
-  // Helper to extract number of passes from string like "3x" or "2x (Monte 1)..."
   const getPassCount = (info: string) => {
     const match = info.match(/(\d+)x/);
     if (!match) return 1;
-    // For "2x (Monte 1), 1x (Demais)", we might want to show total, but let's keep it simple:
-    // If it has multiple, we take the largest or total. User said "if 3 passes, 3 check boxes".
     if (info.includes(',')) {
       const allMatches = info.match(/\d+x/g);
       if (allMatches) {
@@ -121,14 +126,13 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right">Nec. Prevista</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0]">SETUP DE PASSADAS</th>
                   <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-right w-24">Impressões</th>
-                  <th className="py-3 px-4 text-[10px] font-black uppercase tracking-widest text-[#8B8BA0] text-center w-32">Confirmação</th>
                 </tr>
               </thead>
               <tbody>
                 {block.operations ? block.operations.map((op) => {
                   const numPasses = getPassCount(op.passesInfo);
-                  const states = confirmedPasses[op.id] || Array(numPasses).fill(false);
-                  const isFullyConfirmed = states.every(s => s);
+                  const states = confirmedPasses[op.id] || Array(numPasses).fill(null).map(() => ({ confirmed: false }));
+                  const isFullyConfirmed = states.every(s => s.confirmed);
                   
                   return (
                   <tr key={op.id} className={`border-b border-[#EEEDF5] last:border-b-0 transition-colors ${isFullyConfirmed ? 'bg-green-50/30' : 'hover:bg-[#FAFAFC]'}`}>
@@ -149,9 +153,36 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                       </div>
                     </td>
                     <td className="py-4 px-4 align-top">
-                      <div className="flex items-start gap-2 text-[12px] font-medium text-[#6B6B80] leading-snug">
-                        <Layers size={14} className="text-[#A0A0B0] mt-0.5 shrink-0" />
-                        {op.passesInfo}
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-col gap-1 min-w-[120px]">
+                          <div className="flex items-center gap-2 text-[12px] font-black text-[#6B6B80]">
+                            <Layers size={14} className="text-[#A0A0B0] shrink-0" />
+                            {op.passesInfo}
+                          </div>
+                        </div>
+
+                        {/* Pass Checkboxes integrated here */}
+                        <div className="flex items-start gap-3 ml-2 border-l border-[#EEEDF5] pl-4">
+                          {states.map((st, idx) => (
+                            <div key={idx} className="flex flex-col items-center gap-1">
+                              <button
+                                onClick={() => togglePass(op.id, idx, numPasses)}
+                                className={`w-8 h-8 rounded-xl border-2 flex items-center justify-center transition-all shadow-sm
+                                  ${st.confirmed 
+                                    ? 'bg-[#00B894] border-[#00B894] text-white' 
+                                    : 'bg-white border-[#EEEDF5] text-transparent hover:border-[#00B894]'
+                                  }`}
+                              >
+                                <span className="text-[11px] font-black">{idx + 1}</span>
+                              </button>
+                              {st.time && (
+                                <span className="text-[9px] font-black text-[#00B894] whitespace-nowrap bg-[#00B89410] px-1 rounded">
+                                  H {st.time}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </td>
                     <td className="py-4 px-4 align-top text-right">
@@ -160,28 +191,10 @@ function ProductionModal({ block, onClose }: { block: ProductionBlock, onClose: 
                         {op.impressions}
                       </div>
                     </td>
-                    <td className="py-4 px-4 align-top">
-                      <div className="flex items-center justify-center gap-2">
-                        {states.map((confirmed, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => togglePass(op.id, idx, numPasses)}
-                            title={`Passada ${idx + 1}`}
-                            className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all shadow-sm
-                              ${confirmed 
-                                ? 'bg-green-500 border-green-500 text-white' 
-                                : 'bg-white border-[#EEEDF5] text-transparent hover:border-[#00B894]'
-                              }`}
-                          >
-                            <span className="text-[10px] font-black">{idx + 1}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </td>
                   </tr>
                 )}) : (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-sm font-medium text-[#A0A0B0]">
+                    <td colSpan={5} className="py-8 text-center text-sm font-medium text-[#A0A0B0]">
                       Nenhuma especificação de tinta atrelada a esta Ordem.
                     </td>
                   </tr>
