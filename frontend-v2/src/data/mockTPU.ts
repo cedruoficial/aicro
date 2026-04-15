@@ -26,23 +26,62 @@ export const getMockTpuJobs = (dayOffset: number): TPUJob[] => {
   const isFuture = dayOffset > 0;
   const isPast = dayOffset < 0;
 
-  for (let i = 1; i <= 35; i++) {
-    const isRotativa = i <= 4;
-    const mType: MachineType = isRotativa ? 'Rotativa' : 'Manual';
-    const mName = isRotativa ? `Rotativa ${String(i).padStart(2, '0')}` : `Manual ${String(i - 4).padStart(2, '0')}`;
+  for (let i = 1; i <= 4; i++) {
+    const mType: MachineType = 'Rotativa';
+    const mName = `Rotativa ${String(i).padStart(2, '0')}`;
+    const material = materials[i % materials.length];
+    const client = clients[i % clients.length];
+    
+    // Configuração específica para as de cima (Rotativas)
+    let status: TPUJob['status'] = 'Aguardando';
+    let priority: JobPriority = 'Normal';
+    let qtyReq = 2000 + (i * 500);
+    let qtyProd = 0;
+
+    if (i <= 3) {
+      status = 'Em Produção';
+      qtyProd = Math.floor(qtyReq * 0.2); // Começa com 20%
+    }
+    if (i === 2) {
+      priority = 'Atrasado'; 
+    }
+    if (i === 4) {
+      status = 'Concluído';
+      qtyProd = qtyReq;
+    }
+
+    const operatorData = operators[i % operators.length];
+
+    jobs.push({
+      id: `tpu-day${dayOffset}-${idCounter}`,
+      material: `M${String(idCounter + 200000).padStart(6, '0')} - ${material}`,
+      reference: `E${String(idCounter + 100000).padStart(6, '0')}`,
+      client,
+      machineType: mType,
+      machineName: mName,
+      operator: { id: `op-${i % operators.length}`, name: operatorData.name, shift: operatorData.shift },
+      quantityRequested: qtyReq,
+      quantityProduced: qtyProd,
+      priority,
+      forecastEnd: `${String(10 + (i % 8)).padStart(2, '0')}:${String((i * 15) % 60).padStart(2, '0')}`,
+      status,
+    });
+    idCounter++;
+  }
+
+  for (let i = 5; i <= 35; i++) {
+    const mType: MachineType = 'Manual';
+    const mName = `Manual ${String(i - 4).padStart(2, '0')}`;
     const material = materials[(i + Math.abs(dayOffset)) % materials.length];
     const client = clients[(i + Math.abs(dayOffset)) % clients.length];
     
     // Status Logic
     let status: TPUJob['status'] = 'Aguardando';
     if (isPast) {
-      status = 'Concluído'; // Past days are mostly done
-      if (i % 8 === 0) status = 'Atrasado' as any; // keeping it simple, but wait 'Atrasado' is not a status. Statuses are: 'Aguardando' | 'Em Produção' | 'Concluído' | 'Pausado'
       status = i % 15 === 0 ? 'Pausado' : 'Concluído';
     } else if (isFuture) {
-      status = 'Aguardando'; // Future is waiting
+      status = 'Aguardando';
     } else {
-      // Today
       const statuses = ['Concluído', 'Em Produção', 'Aguardando', 'Pausado'] as const;
       status = statuses[i % statuses.length];
     }
