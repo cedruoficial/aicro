@@ -28,7 +28,7 @@ export function TPU() {
     const interval = setInterval(() => {
       setJobs(current => current.map(job => {
         if (job.status === 'Em Produção' && job.quantityProduced < job.quantityRequested) {
-          const increment = Math.floor(Math.random() * 5) + 1;
+          const increment = Math.floor(Math.random() * 25) + 15; // Aumentado para 15-40
           return {
             ...job,
             quantityProduced: Math.min(job.quantityProduced + increment, job.quantityRequested),

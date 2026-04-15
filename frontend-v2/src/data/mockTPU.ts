@@ -29,7 +29,7 @@ export const getMockTpuJobs = (dayOffset: number): TPUJob[] => {
   for (let i = 1; i <= 35; i++) {
     const isRotativa = i <= 4;
     const mType: MachineType = isRotativa ? 'Rotativa' : 'Manual';
-    const mName = isRotativa ? `Rotativa ${String(i).padStart(2, '0')}` : `Manual ${String(i).padStart(2, '0')}`;
+    const mName = isRotativa ? `Rotativa ${String(i).padStart(2, '0')}` : `Manual ${String(i - 4).padStart(2, '0')}`;
     const material = materials[(i + Math.abs(dayOffset)) % materials.length];
     const client = clients[(i + Math.abs(dayOffset)) % clients.length];
     
