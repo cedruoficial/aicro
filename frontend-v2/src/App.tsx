@@ -16,7 +16,7 @@ export default function App() {
     <BrowserRouter>
       <div className="bg-[#F4F3F8] min-h-screen font-sans text-[#2D2D3A] overflow-x-hidden">
         <Header />
-        <main>
+        <main className="pt-14">
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
             <Route path="/home" element={<PainelGeral />} />

@@ -203,7 +203,7 @@ function JobCard({ job }: { job: TPUJob }) {
   const progress = job.quantityRequested > 0 ? (job.quantityProduced / job.quantityRequested) * 100 : 0;
   
   const isAtrasado = job.priority === 'Atrasado';
-  const cardBg = isAtrasado ? 'bg-[#FFF4F4] border-[#FFDADA]' : 'bg-white border-[#EEEDF5]';
+  const cardBg = isAtrasado ? 'bg-[#FFEEEE] border-[#FFC1C1] shadow-[0_4px_12px_rgba(255,193,193,0.3)]' : 'bg-white border-[#EEEDF5] shadow-sm';
 
   const priorityColor = 
     job.priority === 'Urgente' ? 'text-[#F19066] bg-[#F1906615] border-[#F1906650]' :

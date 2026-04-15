@@ -214,10 +214,11 @@ interface Problema {
 }
 
 // ─── Card de tarefa ──────────────────────────────────────────────────
-function TaskCard({ task, color, flowInfo }: {
+function TaskCard({ task, color, flowInfo, subName }: {
   task: SubTask;
   color: string;
   flowInfo: FlowPosition | null;
+  subName: string;
 }) {
   const [expanded, setExpanded]         = useState(false);
   const [showReporte, setShowReporte]   = useState(false);
@@ -321,7 +322,7 @@ function TaskCard({ task, color, flowInfo }: {
           <span className="text-xs bg-[#F4F3F8] text-[#8B8BA0] font-bold px-2.5 py-1 rounded-full">{task.origemSetor}</span>
           <ArrowRight size={12} className="text-[#C0C0D0] shrink-0" />
           <span className="text-xs font-black px-2.5 py-1 rounded-full"
-            style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}>AQUI ▶</span>
+            style={{ background: `${color}20`, color, border: `1px solid ${color}40` }}>{subName}</span>
           <ArrowRight size={12} className="text-[#C0C0D0] shrink-0" />
           <span className="text-xs bg-[#F4F3F8] text-[#8B8BA0] font-bold px-2.5 py-1 rounded-full">{nextLabel}</span>
         </div>
@@ -609,7 +610,7 @@ export function SubSectorDetail() {
           </div>
         )}
         {filtered.map((task, i) => (
-          <TaskCard key={i} task={task} color={sector.color} flowInfo={flowInfo} />
+          <TaskCard key={i} task={task} color={sector.color} flowInfo={flowInfo} subName={sub.name} />
         ))}
       </div>
     </div>

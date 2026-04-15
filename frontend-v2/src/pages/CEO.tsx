@@ -3,6 +3,7 @@ import { LineChart, Line, ResponsiveContainer, YAxis } from 'recharts';
 import { ArrowUpRight, ArrowDownRight, Minus, AlertTriangle, AlertCircle, TrendingUp, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { AIAnalysisModal } from '../components/AIAnalysisModal';
+import { MOCK_AI_REPORT } from '../data/mockAI';
 
 export function CEO() {
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
@@ -12,24 +13,12 @@ export function CEO() {
   const handleAIAnalysis = async () => {
     setIsAIModalOpen(true);
     setIsAILoading(true);
-    try {
-      const response = await fetch('/api/ai/analyze-ceo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          metrics: CEO_METRICS,
-          supplyChain: SUPPLY_CHAIN
-        })
-      });
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-      setAiAnalysis(data.analysis);
-    } catch (err: any) {
-      console.error(err);
-      setAiAnalysis(`Erro na análise estratégica: ${err.message || 'Verifique a conexão com o servidor.'}`);
-    } finally {
+    
+    // Simular o delay de "processamento" da IA para a demonstração
+    setTimeout(() => {
+      setAiAnalysis(MOCK_AI_REPORT);
       setIsAILoading(false);
-    }
+    }, 2500);
   };
 
   return (

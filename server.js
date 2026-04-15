@@ -462,7 +462,7 @@ app.use('/uploads', express.static(UPLOADS_DIR));
             res.sendFile(path.join(__dirname, 'public', 'index.html'));
         });
 
-        app.listen(PORT, '0.0.0.0', () => {
+        app.listen(PORT, () => {
             const localIp = getLocalIp();
             console.log(`🚀 Servidor CTIA rodando em http://localhost:${PORT}`);
             console.log(`🌐 Acesso na Rede Local: http://${localIp}:${PORT}`);

@@ -116,7 +116,7 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-white border-b border-[#E8E6F0] sticky top-0 z-50 shadow-[0_1px_8px_rgba(108,92,231,0.06)]">
+      <header className="bg-white border-b border-[#E8E6F0] fixed top-0 left-0 right-0 z-50 shadow-[0_1px_8px_rgba(108,92,231,0.06)]">
         <div className="px-4 lg:px-8 h-14 flex items-center justify-between gap-2">
 
           {/* ── Brand ─────────────────────────────────────────────────────────── */}
@@ -520,7 +520,7 @@ function SearchResults({
                             className="text-[7px] font-black mt-1 uppercase h-3"
                             style={{ color: isCurrent ? (isStuck ? '#FF4757' : step.color) : isNext ? '#C0C0D0' : 'transparent' }}
                           >
-                            {isCurrent ? (isStuck ? 'TRAVADO' : 'AQUI') : isNext ? 'próximo' : ''}
+                            {isCurrent ? (isStuck ? 'TRAVADO' : 'SETOR ATUAL') : isNext ? 'próximo' : ''}
                           </div>
                         </div>
                         {wIdx < chainWindow.length - 1 && (

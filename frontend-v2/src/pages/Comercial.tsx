@@ -6,7 +6,7 @@ import {
 import { TransitTimeline } from '../components/TransitTimeline';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
-type PedidoTipo    = 'Producao' | 'Desenvolvimento';
+type PedidoTipo    = 'Producao' | 'Desenvolvimento' | 'Amostra';
 type PedidoStatus  = 'novo' | 'em_triagem' | 'enviado_arte' | 'enviado_pd' | 'concluido' | 'reclamacao';
 type Prioridade    = 'URGENTE' | 'NORMAL' | 'BAIXA';
 
@@ -164,9 +164,11 @@ function PedidoCard({ pedido, onEnviar }: {
             <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
               pedido.tipo === 'Desenvolvimento'
                 ? 'text-[#9B59B6] bg-[#F5EEFB]'
+                : pedido.tipo === 'Amostra'
+                ? 'text-[#FDCB6E] bg-[#FFF9EB]'
                 : 'text-[#0984E3] bg-[#EBF5FF]'
             }`}>
-              {pedido.tipo === 'Desenvolvimento' ? '🔬 P&D' : '🏭 Produção'}
+              {pedido.tipo === 'Desenvolvimento' ? '🔬 P&D' : pedido.tipo === 'Amostra' ? '🧪 Amostra' : '🏭 Produção'}
             </span>
           </div>
           <span className="text-[10px] font-bold text-[#A0A0B0]">{pedido.ref}</span>
@@ -194,7 +196,7 @@ function PedidoCard({ pedido, onEnviar }: {
               background: pedido.tipo === 'Desenvolvimento' ? '#F5EEFB' : '#EBF5FF',
               color:      pedido.tipo === 'Desenvolvimento' ? '#9B59B6' : '#0984E3',
             }}>
-            {pedido.tipo === 'Desenvolvimento' ? '🔬 P&D' : '🎨 Arte'}
+            {pedido.tipo === 'Desenvolvimento' ? '🔬 P&D' : pedido.tipo === 'Amostra' ? '🧪 Amostra' : '🎨 Arte'}
           </span>
           <ArrowRight size={12} className="text-[#C0C0D0]" />
           <span className="text-xs text-[#C0C0D0] font-bold">Lab → Produção → Revisão → Embalagem → Expedição</span>
@@ -314,6 +316,7 @@ function NovoPedidoModal({ onClose }: { onClose: () => void }) {
               <label className="text-[10px] font-black uppercase tracking-widest text-[#A0A0B0] block mb-2">Tipo</label>
               <select className="w-full px-4 py-3 bg-[#F8F7FC] border border-[#EEEDF5] rounded-2xl text-sm font-medium focus:outline-none">
                 <option value="Producao">🏭 Produção</option>
+                <option value="Amostra">🧪 Amostra</option>
                 <option value="Desenvolvimento">🔬 Desenvolvimento (P&D)</option>
               </select>
             </div>

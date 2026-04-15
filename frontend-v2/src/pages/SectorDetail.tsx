@@ -97,7 +97,7 @@ const PRIORITY_CFG = {
 };
 
 // ─── Task Row ─────────────────────────────────────────────────────────────────
-function TaskRow({ task, sectorColor }: { task: FlowTask; sectorColor: string }) {
+function TaskRow({ task, sectorColor, sectorName }: { task: FlowTask; sectorColor: string, sectorName: string }) {
   const elapsed = useElapsedTime(task.iniciadoEm);
   const slaPercent = calcSlaPercent(task.iniciadoEm, task.slaHoras);
   const cfg = STATUS_CFG[task.status];
@@ -151,7 +151,7 @@ function TaskRow({ task, sectorColor }: { task: FlowTask; sectorColor: string })
             <span className="text-[10px] bg-[#F4F3F8] px-2 py-0.5 rounded-full font-bold text-[#8B8BA0]">{task.origemSetor}</span>
             <ArrowRight size={10} className="text-[#C0C0D0]" />
             <span className="text-[10px] font-black px-2 py-0.5 rounded-full" style={{ background: `${sectorColor}20`, color: sectorColor }}>
-              AQUI ▶
+              {sectorName}
             </span>
             <ArrowRight size={10} className="text-[#C0C0D0]" />
             <span className="text-[10px] bg-[#F4F3F8] px-2 py-0.5 rounded-full font-bold text-[#8B8BA0]">{task.proximoSetor}</span>
@@ -318,7 +318,7 @@ export function SectorDetail() {
           </div>
         )}
         {filtered.map(task => (
-          <TaskRow key={task.id} task={task} sectorColor={sector.color} />
+          <TaskRow key={task.id} task={task} sectorColor={sector.color} sectorName={sector.name} />
         ))}
       </div>
 
