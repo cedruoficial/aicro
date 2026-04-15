@@ -92,7 +92,7 @@ export function TPU() {
              </div>
              <div>
                 <h1 className="text-2xl font-black text-[#1E1B4B] tracking-tight">PCP Fabril · TPU</h1>
-                <p className="text-[#6B6B80] text-[11px] font-bold uppercase tracking-wider">Monitoramento em Tempo Real (4s)</p>
+                <p className="text-[#6B6B80] text-sm mt-1 font-medium">Controle focado em Materiais e Referências de Alta Frequência</p>
              </div>
           </div>
 
