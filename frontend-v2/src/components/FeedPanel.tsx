@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 
-import { FEED_EVENTS, SECTORS } from '../data/mock';
+import { FEED_EVENTS } from '../data/mock';
 import type { FeedEvent } from '../types';
 import { typeConfig } from '../data/constants';
-import { AlertCircle, User, Target, Box, Wrench, Clock, PlayCircle, UserPlus, FileSearch, BellRing, History } from 'lucide-react';
+import { AlertCircle, User, Target, Wrench, Clock, PlayCircle, BellRing, History } from 'lucide-react';
 
 // Generates fake random events to keep the feed moving
 function generateFakeEvent(idCounter: number): FeedEvent {
