@@ -42,23 +42,30 @@ export function Insights() {
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-2.5 px-5 py-2.5 rounded-2xl text-sm font-black transition-all duration-200 ${
-                tab === t.key
-                  ? 'text-white shadow-lg shadow-[#6C5CE730]'
-                  : 'bg-[#F8F7FC] text-[#8B8BA0] hover:bg-[#F0EFF8] hover:text-[#6C5CE7]'
-              }`}
+              className={`flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[13px] font-black transition-all duration-300 relative group
+                ${tab === t.key
+                  ? 'text-white shadow-[0_8px_20px_rgba(108,92,231,0.4)] scale-105 z-10'
+                  : 'bg-white border-2 border-[#F0EFF8] text-[#8B8BA0] hover:border-[#6C5CE7] hover:text-[#6C5CE7] hover:bg-[#F8F7FC] shadow-sm'
+                }`}
               style={
                 tab === t.key
-                  ? { background: 'linear-gradient(135deg, #6C5CE7, #5A4BCE)' }
+                  ? { background: 'linear-gradient(135deg, #6C5CE7, #8075FF)' }
                   : {}
               }
             >
-              {t.icon}
+              <span className={`transition-transform duration-300 ${tab === t.key ? 'scale-110' : 'group-hover:scale-110'}`}>
+                {t.icon}
+              </span>
               <span>{t.label}</span>
               {tab !== t.key && (
-                <span className="hidden lg:inline text-[10px] font-medium text-[#C0C0D0]">
+                <span className="hidden lg:inline text-[10px] font-bold opacity-60">
                   · {t.sub}
                 </span>
+              )}
+              
+              {/* Active Indicator Glow */}
+              {tab === t.key && (
+                <div className="absolute inset-0 rounded-2xl bg-[#6C5CE7] blur-[12px] opacity-20 -z-10 animate-pulse"></div>
               )}
             </button>
           ))}

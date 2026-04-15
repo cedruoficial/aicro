@@ -39,153 +39,126 @@ export function FeedPanel() {
       idRef.current += 1;
       const newEvt = generateFakeEvent(idRef.current);
       setLiveFeed(prev => [newEvt, ...prev].slice(0, 50)); // keep last 50
-    }, 4500); // 4.5 seconds tick
+    }, 1500); // 1.5 seconds tick (Dinamismo total)
 
     return () => clearInterval(int);
   }, []);
 
   return (
-    <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden sticky top-[88px] h-[calc(100vh-112px)]">
+    <div className="bg-[#1A1825]/80 backdrop-blur-xl rounded-[32px] border border-[#2D2B3A] shadow-[0_32px_64px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden sticky top-[88px] h-[calc(100vh-112px)] group">
+      {/* Glow effect backgrounds */}
+      <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#6C5CE710] blur-[80px] rounded-full group-hover:bg-[#6C5CE720] transition-colors duration-700"></div>
+
       {/* Header */}
-      <div className="p-5 px-6 border-b border-[#F0F0F5] flex items-center justify-between shrink-0">
+      <div className="p-6 px-8 border-b border-[#2D2B3A] flex items-center justify-between shrink-0 bg-[#1A1825]/40">
         <div>
-          <h2 className="text-base font-bold m-0 text-[#2D2D3A] flex items-center gap-2">
+          <h2 className="text-lg font-black m-0 text-white flex items-center gap-3 tracking-tight">
             Feed em Tempo Real
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00B894] opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#00B894]"></span>
             </span>
           </h2>
-          <p className="text-xs text-[#8B8BA0] mt-0.5 font-medium">Sincronizando setor produtivo...</p>
+          <p className="text-xs text-[#6B6B80] mt-1 font-bold uppercase tracking-widest">Painel de Operações Live</p>
         </div>
       </div>
 
       {/* List */}
-      <div className="flex-1 overflow-y-auto py-2 pr-1 custom-scrollbar">
-        {liveFeed.map(event => {
+      <div className="flex-1 overflow-y-auto pt-2 pb-6 pr-1 custom-scrollbar-dark">
+        {liveFeed.map((event, idx) => {
           const config = typeConfig[event.type];
           const isSelected = selectedFeedItem === event.id;
+          const isNewest = idx === 0;
 
           return (
             <div
               key={event.id}
               onClick={() => setSelectedFeedItem(isSelected ? null : event.id)}
-              className="p-3.5 px-6 border-l-4 mb-px cursor-pointer transition-all duration-300 animate-in slide-in-from-top-4 fade-in-0"
+              className={`p-4 px-8 border-l-4 mb-px cursor-pointer transition-all duration-500 relative group/item
+                ${isNewest ? 'animate-in slide-in-from-top-4 fade-in-0 duration-500' : ''}
+              `}
               style={{
                 borderLeftColor: config.color,
-                background: isSelected ? config.bg : 'transparent',
-              }}
-              onMouseEnter={(e) => {
-                if (!isSelected) e.currentTarget.style.background = '#FAFAFE';
-              }}
-              onMouseLeave={(e) => {
-                if (!isSelected) e.currentTarget.style.background = 'transparent';
+                background: isSelected ? `${config.color}15` : 'transparent',
               }}
             >
               {/* Event Meta */}
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-[11px] text-[#A0A0B0] font-semibold tracking-wide tabular-nums">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-[11px] text-[#6B6B80] font-black tracking-widest tabular-nums italic">
                   {event.time}
                 </span>
                 <span 
-                  className="px-2 py-0.5 rounded-md text-[10px] font-extrabold tracking-wide"
-                  style={{ background: `${config.color}14`, color: config.color }}
+                  className="px-2.5 py-0.5 rounded-lg text-[10px] font-black tracking-wider uppercase flex items-center gap-1.5 shadow-sm"
+                  style={{ background: `${config.color}20`, color: config.color, border: `1px solid ${config.color}30` }}
                 >
-                  {config.icon} {config.label}
+                  <span className="scale-90">{config.icon}</span>
+                  {config.label}
                 </span>
-                <span className="text-[10px] text-[#C0C0D0] font-medium">
+                <span className="text-[10px] text-[#A0A0B0] font-bold uppercase tracking-tight opacity-60">
                   {event.sector}
                 </span>
               </div>
 
               {/* Message */}
-              <div className="text-[13px] font-semibold text-[#2D2D3A] leading-[1.4]">
+              <div className={`text-[14px] font-bold leading-relaxed transition-colors duration-300 ${isSelected ? 'text-white' : 'text-[#C0C0D0] group-hover/item:text-white'}`}>
                 {event.message}
               </div>
 
               {/* Details (Expanded) */}
               {isSelected && (
-                <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-4 animate-in fade-in slide-in-from-top-2 duration-300" onClick={(e) => e.stopPropagation()}>
                   {event.type === 'reprovado' ? (
-                    <div className="bg-white border rounded-[14px] overflow-hidden shadow-[0_4px_16px_rgba(255,71,87,0.06)] mb-3" style={{ borderColor: `${config.color}40` }}>
-                      <div className="px-3 py-2.5 border-b flex justify-between items-center bg-white" style={{ borderColor: `${config.color}20` }}>
-                        <span className="text-xs font-bold flex items-center gap-1.5" style={{ color: config.color }}>
-                          <AlertCircle size={14} strokeWidth={2.5}/> AÇÃO CORRETIVA IMEDIATA
+                    <div className="bg-[#13111C] border rounded-2xl overflow-hidden shadow-2xl mb-4" style={{ borderColor: `${config.color}40` }}>
+                      <div className="px-4 py-3 border-b flex justify-between items-center bg-[#1A1825]" style={{ borderColor: `${config.color}20` }}>
+                        <span className="text-[11px] font-black flex items-center gap-2 tracking-widest uppercase" style={{ color: config.color }}>
+                          <AlertCircle size={14} strokeWidth={3}/> Ação Corretiva
                         </span>
                         {event.priority && (
-                          <span className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${event.priority === 'ALTA' ? 'bg-[#FF4757] text-white' : 'bg-[#FDCB6E] text-[#2D2D3A]'}`}>
-                            PRIORIDADE {event.priority}
+                          <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg ${event.priority === 'ALTA' ? 'bg-[#FF4757] text-white' : 'bg-[#FDCB6E] text-[#1A1825]'}`}>
+                            {event.priority}
                           </span>
                         )}
                       </div>
                       
-                      <div className="p-3 bg-[#FAFAFC] text-xs grid grid-cols-1 gap-y-3">
-                        <div className="grid grid-cols-2 gap-3">
+                      <div className="p-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <span className="flex items-center gap-1 text-[#8B8BA0] font-semibold text-[10px] mb-0.5"><User size={10} /> RESPONSÁVEIS</span>
-                            <span className="font-semibold text-[#2D2D3A] text-[11px]">{event.responsibles}</span>
+                            <span className="flex items-center gap-1.5 text-[#6B6B80] font-black text-[9px] uppercase tracking-widest mb-1.5"><User size={12} /> Responsáveis</span>
+                            <span className="font-bold text-[#C0C0D0] text-[12px] block bg-[#222030] p-1.5 rounded-lg border border-[#2D2B3A]">{event.responsibles}</span>
                           </div>
                           <div>
-                            <span className="flex items-center gap-1 text-[#8B8BA0] font-semibold text-[10px] mb-0.5"><Target size={10} /> ONDE ATUAR</span>
-                            <span className="font-semibold text-[#2D2D3A] text-[11px]">{event.whereToAct}</span>
+                            <span className="flex items-center gap-1.5 text-[#6B6B80] font-black text-[9px] uppercase tracking-widest mb-1.5"><Target size={12} /> Onde Atuar</span>
+                            <span className="font-bold text-[#C0C0D0] text-[12px] block bg-[#222030] p-1.5 rounded-lg border border-[#2D2B3A]">{event.whereToAct}</span>
                           </div>
                         </div>
 
                         <div>
-                          <span className="flex items-center gap-1 text-[#8B8BA0] font-semibold text-[10px] mb-0.5"><Box size={10} /> IDENTIFICAÇÃO DO MATERIAL</span>
-                          <span className="font-medium text-[#2D2D3A] text-[11px] bg-white border border-[#F0F0F5] px-2 py-1 rounded inline-block">{event.materialId}</span>
-                        </div>
-
-                        <div>
-                          <span className="flex items-center gap-1 text-[#8B8BA0] font-semibold text-[10px] mb-0.5"><Wrench size={10} /> AÇÃO REQUERIDA</span>
-                          <span className="font-semibold text-[#2D2D3A] text-[12px] leading-tight block">{event.actionRequired}</span>
+                          <span className="flex items-center gap-1.5 text-[#6B6B80] font-black text-[9px] uppercase tracking-widest mb-1.5"><Wrench size={12} /> Ação Requerida</span>
+                          <span className="font-extrabold text-white text-[13px] leading-snug block bg-[#6C5CE710] border border-[#6C5CE720] p-2.5 rounded-xl">{event.actionRequired}</span>
                         </div>
 
                         {event.deadline && (
-                          <div className="pt-2 border-t border-[#F0F0F5] flex items-center justify-between">
-                            <div className="flex items-center gap-1.5 text-[#FF4757] font-bold text-[11px]">
-                              <Clock size={12} /> Prazo: {event.deadline}
+                          <div className="pt-3 border-t border-[#2D2B3A] flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-[#FF4757] font-black text-[11px] uppercase tracking-widest">
+                              <Clock size={14} strokeWidth={3} /> Prazo: {event.deadline}
                             </div>
                           </div>
                         )}
                       </div>
 
                       {/* Botões de Ação */}
-                      <div className="bg-white p-2.5 border-t border-[#F0F0F5] flex gap-2 overflow-x-auto custom-scrollbar">
-                        <button className="flex-1 whitespace-nowrap flex items-center justify-center gap-1.5 bg-[#FF4757] hover:bg-[#E84353] text-white text-[11px] font-bold py-1.5 px-3 rounded-lg transition-colors">
-                          <PlayCircle size={12} /> Iniciar
+                      <div className="bg-[#1A1825] p-3 border-t border-[#2D2B3A] flex gap-2">
+                        <button className="flex-1 flex items-center justify-center gap-2 bg-[#6C5CE7] hover:bg-[#5A4BCE] text-white text-[11px] font-black p-2.5 rounded-xl transition-all shadow-lg shadow-[#6C5CE720]">
+                          <PlayCircle size={14} /> INICIAR
                         </button>
-                        <button className="whitespace-nowrap flex items-center justify-center gap-1.5 bg-[#F4F3F8] hover:bg-[#EAE8F0] text-[#6B6B80] text-[11px] font-bold py-1.5 px-3 rounded-lg transition-colors">
-                          <UserPlus size={12} /> Atribuir
-                        </button>
-                        <button className="whitespace-nowrap flex items-center justify-center gap-1.5 bg-[#F4F3F8] hover:bg-[#EAE8F0] text-[#6B6B80] text-[11px] font-bold py-1.5 px-3 rounded-lg transition-colors">
-                          <FileSearch size={12} /> Laudo
+                        <button className="flex-1 flex items-center justify-center gap-2 bg-[#2D2B3A] hover:bg-[#3D3B4A] text-[#A0A0B0] text-[11px] font-black p-2.5 rounded-xl border border-[#3D394D] transition-all">
+                          LAUDO
                         </button>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-xs text-[#6B6B80] leading-[1.5] p-2 px-3 bg-[#F8F7FC] rounded-lg mb-2">
+                    <div className="text-[12px] text-[#A0A0B0] font-medium leading-[1.6] p-4 bg-[#13111C] border border-[#2D2B3A] rounded-2xl mb-3 shadow-inner">
                       {event.detail}
-                    </div>
-                  )}
-
-                  {event.notifyTo && event.notifyTo.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-1">
-                      <span className="text-[10px] text-[#A0A0B0] font-bold flex items-center mr-1 uppercase tracking-wide">
-                        Notificado:
-                      </span>
-                      {event.notifyTo.map((sId) => {
-                        const s = SECTORS.find(sec => sec.id === sId);
-                        return s ? (
-                          <span 
-                            key={sId} 
-                            className="px-2 py-0.5 rounded-md text-[9px] font-extrabold uppercase tracking-wide"
-                            style={{ background: `${s.color}14`, color: s.color }}
-                          >
-                            {s.name}
-                          </span>
-                        ) : null;
-                      })}
                     </div>
                   )}
                 </div>
@@ -196,22 +169,22 @@ export function FeedPanel() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 px-6 border-t border-[#F0F0F5] bg-[#FAFAFC] flex justify-between items-center shrink-0">
-        <button className="flex items-center gap-2 py-2 px-3 rounded-xl bg-white border border-[#EEEDF5] hover:border-[#F6C948] hover:bg-[#FFFBEE] text-[#9A7B0A] shadow-sm transition-all animate-pulse shadow-yellow-100">
-          <BellRing size={14} className="text-[#F6C948]" />
-          <span className="text-xs font-black tracking-tight">Alertas Históricos</span>
+      <div className="p-6 px-8 border-t border-[#2D2B3A] bg-[#1A1825]/60 backdrop-blur-md flex justify-between items-center shrink-0">
+        <button className="flex items-center gap-2.5 py-3 px-5 rounded-2xl bg-[#F6C94820] border border-[#F6C94840] hover:bg-[#F6C94830] text-[#F6C948] transition-all group/btn">
+          <BellRing size={16} className="group-hover/btn:animate-bounce" />
+          <span className="text-xs font-black uppercase tracking-widest">Histórico</span>
         </button>
 
-        <button className="flex items-center gap-2 py-2 px-3 rounded-xl text-[#0984E3] hover:bg-[#0984E310] transition-colors font-bold text-xs">
-          <History size={14} /> Full Log
+        <button className="flex items-center gap-2.5 py-3 px-5 rounded-2xl text-[#6B6B80] hover:text-white hover:bg-[#2D2B3A] transition-all font-black text-[10px] uppercase tracking-widest">
+          <History size={16} /> Full Log
         </button>
       </div>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #D0D0E0; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #A0A0B0; }
+        .custom-scrollbar-dark::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar-dark::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb { background: #2D2B3A; border-radius: 10px; }
+        .custom-scrollbar-dark::-webkit-scrollbar-thumb:hover { background: #6C5CE7; }
       `}</style>
     </div>
   );
