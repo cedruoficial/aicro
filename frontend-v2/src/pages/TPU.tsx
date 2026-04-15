@@ -144,8 +144,8 @@ export function TPU() {
         </div>
       </div>
 
-      {/* LISTA AGRUPADA POR MATERIAL */}
-      <div className="max-w-[1440px] mx-auto w-full px-6 lg:px-8 flex-1">
+      {/* LISTA AGRUPADA POR MATERIAL - Layout Flexível para economizar espaço */}
+      <div className="px-6 lg:px-8 w-full flex-1">
         {groupedData.length === 0 ? (
           <div className="text-center py-20">
              <Factory size={48} className="mx-auto text-[#D1D0D9] mb-4" />
@@ -153,39 +153,41 @@ export function TPU() {
              <p className="text-[#8B8BA0]">Tente alterar os filtros ou a busca.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 3xl:grid-cols-3 gap-8 items-start">
             {groupedData.map((group) => {
               const groupProgress = group.totalRequested > 0 ? (group.totalProduced / group.totalRequested) * 100 : 0;
               
               return (
-                <div key={group.materialName} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  {/* HEADER DO GRUPO */}
-                  <div className="flex items-end justify-between border-b border-[#D1D0D9] pb-2 mb-4">
+                <div key={group.materialName} className="bg-white/40 border border-[#EEEDF5] rounded-3xl p-5 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 flex flex-col h-full">
+                  {/* HEADER DO GRUPO - Mais Compacto */}
+                  <div className="flex items-center justify-between border-b border-[#D1D0D9]/50 pb-3 mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#1E1B4B] to-[#6C5CE7] flex items-center justify-center shadow-lg">
+                      <div className="w-8 h-8 rounded-xl bg-[#1E1B4B] flex items-center justify-center shadow-lg shrink-0">
                          <Target className="text-white" size={16} />
                       </div>
-                      <h2 className="text-xl font-black text-[#1E1B4B]">{group.materialName}</h2>
+                      <h2 className="text-lg font-black text-[#1E1B4B] truncate max-w-[200px]" title={group.materialName}>
+                        {group.materialName}
+                      </h2>
                     </div>
                     
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 bg-white/80 px-3 py-1.5 rounded-2xl border border-[#EEEDF5]">
                       <div className="text-right">
-                        <div className="text-[10px] font-bold uppercase text-[#8B8BA0]">Progresso do Grupo</div>
-                        <div className="text-sm font-black text-[#2D2D3A]">
-                          {group.totalProduced.toLocaleString()} / {group.totalRequested.toLocaleString()}
+                        <div className="text-[9px] font-black uppercase text-[#8B8BA0]">Progresso</div>
+                        <div className="text-xs font-black text-[#2D2D3A]">
+                          {group.totalProduced} / {group.totalRequested}
                         </div>
                       </div>
-                      <div className="w-[100px] h-2 bg-[#E8E6F0] rounded-full overflow-hidden">
+                      <div className="w-12 h-1.5 bg-[#E8E6F0] rounded-full overflow-hidden">
                          <div 
-                           className="h-full bg-gradient-to-r from-[#6C5CE7] to-[#00CEC9] rounded-full transition-all duration-1000" 
+                           className="h-full bg-gradient-to-r from-[#6C5CE7] to-[#00CEC9] rounded-full" 
                            style={{ width: `${groupProgress}%` }}
                          />
                       </div>
                     </div>
                   </div>
 
-                  {/* CARTÕES DAS MÁQUINAS/REFERÊNCIAS */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* GRID INTERNO DO GRUPO - Lado a Lado tbm */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {group.jobs.map(job => <JobCard key={job.id} job={job} />)}
                   </div>
                 </div>
